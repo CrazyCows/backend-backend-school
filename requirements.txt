@@ -1,0 +1,4 @@
+firebase-admin
+fastapi
+asyncpg
+passlib
