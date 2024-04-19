@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Response, HTTPException
+from fastapi import APIRouter, Request, Response, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -22,7 +22,6 @@ def decrypt_data(data: str) -> str:
     return cipher.decrypt(data.encode()).decode()
 
 def get_cookie(request: Request):
-    pass
     encrypted_data = request.cookies.get("secure_cookie")
     if encrypted_data:
         decrypted_data = decrypt_data(encrypted_data)
@@ -45,13 +44,12 @@ async def create_user(user: CreateUser, request: Request):
 async def user_login(user: UserLogin, response: Response):
     try:
 
-        print("hi")
-        print(user)
         current_user = await controls.login(user)
         data = current_user.uid_user
         encrypted_data = encrypt_data(data)
+        response = JSONResponse(content={"message": "successfully logged in user"}, status_code=200)
         response.set_cookie(key="secure_cookie", value=encrypted_data, max_age=max_age)
-        return JSONResponse(content={"message": "successfully logged in user"}, status_code=200)
+        return response
     except:
         return JSONResponse(content={"message": "not successful logging in user"}, status_code=403)
 
