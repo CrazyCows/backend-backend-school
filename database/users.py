@@ -2,6 +2,7 @@ import asyncio
 
 from database.conn_pool import PoolUsersData
 from models.users_model import User, UserLogin, CreateUser
+from helpers.password_encrypt import Encryption
 from typing import List
 
 # This is just an example to show how to use the pool and the database connection - database does not exist yet
