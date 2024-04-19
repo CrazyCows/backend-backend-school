@@ -7,10 +7,9 @@ from models.users_model import User
 
 
 class ShiftMember(User):
-    uid_shift: str
-    attendance: bool #Attended the shift or skipped work/got sick
-    wished: bool #wished for the shift or not, to be prioritised
-    activemember: bool #true if the member has been assigned the shift
+    attendance: Optional[str] = None #Attended the shift or skipped work/got sick
+    wished: Optional[bool] = None #wished for the shift or not, to be prioritised
+    active_member: Optional[bool] = None #true if the member has been assigned the shift
 
 class Shift(BaseModel):
     uid_shift: Optional[str] = None

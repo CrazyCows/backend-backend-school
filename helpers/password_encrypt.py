@@ -13,5 +13,3 @@ class Encryption:
             return True
         else:
             return False
-
-

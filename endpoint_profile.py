@@ -91,11 +91,11 @@ async def fetch_shift(shift: Shift, request: Request):
         return JSONResponse(content={"message": "not successful fetching shift"}, status_code=403)
 
 @router.get("/fetch-shifts-for-month/")
-async def fetch_shifts_for_month(date: date, user: User, request: Request):
+async def fetch_shifts_for_month(chosen_date: date, user: User, request: Request):
     get_cookie(request)
     try:
-        month_shifts = await controls.get_shifts_for_month(date, user)
-        return JSONResponse(content={"message": "successfully fetched all shifts for month", "shifts": month_shifts.dict()}, status_code=200)
+        month_calender = await controls.get_shifts_for_month(chosen_date, user)
+        return JSONResponse(content={"message": "successfully fetched all shifts for month", "shifts": month_calender.dict()}, status_code=200)
     except:
         return JSONResponse(content={"message": "not successful fetching all shifts for month"}, status_code=403)
 

@@ -38,9 +38,10 @@ class Controller(metaclass=SingletonMeta):
         shift = await self.calenderdb.fetch_shift(shift)
         return shift
 
-    async def get_shifts_for_month(self, date: date, user: User):
-        calender = await self.calenderdb.fetch_month_shifts(date, user)
-        return calender
+    async def get_shifts_for_month(self, _date: date, user: User):
+        _calender = await self.calenderdb.fetch_month_shifts(_date, user)
+
+        return _calender
 
     async def delete_shift(self, shift: Shift):
         await self.calenderdb.delete_shift(shift)

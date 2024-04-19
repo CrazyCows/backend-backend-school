@@ -1,4 +1,5 @@
 # This makes a list of singleton instances, so we don't need to create a new singleton pattern everytime.
+# This is
 class SingletonMeta(type):
     _instances = {}
 
