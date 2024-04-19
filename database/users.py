@@ -79,6 +79,9 @@ async def main():
 
     user_login = UserLogin(username="test", password="<PASSWORD>")
 
+    print(await database.fetch_user(user_login))
+
+
 
 if __name__ == '__main__':
     asyncio.run(main())

@@ -1,4 +1,7 @@
+import asyncio
+
 from database import calender, users
+from database.conn_pool import PoolUsersData
 from models.calender_model import Calender, Clearnce_lvl, Shift, ShiftMember
 from models.users_model import User, UserLogin, CreateUser
 from helpers.singleton import SingletonMeta
@@ -56,3 +59,15 @@ class Controller(metaclass=SingletonMeta):
         return shift_members
     async def delete_shift_member(self, shiftmember: ShiftMember):
         await self.calenderdb.delete_shift_member(shiftmember)
+
+
+async def main():
+    await PoolUsersData().initialize_pool()
+    controller = Controller()
+    user_login = UserLogin(username="test", password="<PASSWORD>")
+    print(user_login)
+    await controller.login(user_login)
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
