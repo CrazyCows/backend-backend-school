@@ -8,7 +8,6 @@ from models.users_model import User, CreateUser, UserLogin
 
 from database.users import Database as users_database
 
-
 # This is just an example to show how to use the pool and the database connection - database does not exist yet
 # Transactions is used for deletes and inserts to prevent the data from being read when modified.
 class Database:
@@ -17,8 +16,8 @@ class Database:
 
     async def create_shift(self, shift: Shift) -> Shift:
         async with self.pool.acquire() as conn:
-            create_statement = "INSERT INTO shifts(start_time, end_time, active) VALUES ($1, $2, $3)"
-            params = [shift.start_time, shift.end_time, shift.active]
+            create_statement = "INSERT INTO shifts(start_time, end_time, active, creation_date) VALUES ($1, $2, $3, $4)"
+            params = [shift.start_time, shift.end_time, shift.active, datetime.now()]
             await conn.execute(create_statement, *params)
 
     async def update_shift(self, shift: Shift):
@@ -28,20 +27,22 @@ class Database:
             params = [shift.uid_shift, shift.start_time, shift.end_time, shift.active]
             await conn.execute(update_statement, *params)
 
+
     async def delete_shift(self, shift: Shift):
         async with self.pool.acquire() as conn:
-            query = "DELETE FROM shifts WHERE shifts.uid_shift=$1"
+            query = "DELETE FROM shifts WHERE shifts.uid_shift = $1"
             params = shift.uid_shift
-            await conn.execute(query, *params)
+            await conn.execute(query, params)
 
     async def fetch_shift(self, shift: Shift) -> Shift:
         async with self.pool.acquire() as conn:
             query = "SELECT * FROM shifts WHERE uid_shift = $1"
             params = shift.uid_shift
-            results = await conn.fetch(query, *params)
+            results = await conn.fetch(query, params)
             return results
 
     # TODO: This can't be right(?)
+    # It's not :(( I have checked the functions above, and they should be working now. Down under hasn't been tested properly, and fetch_month doesn't work yet
     async def fetch_month_shifts(self, date: date, user: User) -> Calender:
         async with self.pool.acquire() as conn:
             calender: Calender
@@ -101,25 +102,34 @@ async def main():
     database = Database()
 
     '''
+
     name: str
     email: str
     phone: Optional[str] = None
     role: str
     username: str
-    password: str'''
+    password: str
+
+    '''
     create_user = CreateUser(name="test", email="<MAIL>", phone="<PHONE>", role="admin", username="test",
                              password="<PASSWORD>")
-    # await users_database().create_user(create_user)
+    #await users_database().create_user(create_user)
     #user = User(name="test", email="<MAIL>", phone="<PHONE>", role="admin", username="test", password="<PASSWORD>")
     #await users_database().delete_user()
 
-    shift = Shift(uid_shift='28926f84-3e64-467c-b207-8a565e2ca386', start_time=datetime.now(), end_time=datetime.now(), active=True)
-    # await database.create_shift(shift)
 
-
+    shift = Shift(uid_shift='f7e868a1-6d03-41e0-8dcf-821f9f84aaf5', start_time=datetime.now(), end_time=datetime.now(), active=False)
+    await database.create_shift(shift)
     user_login = UserLogin(username="test", password="<PASSWORD>")
     user = await users_database().fetch_user(user_login)
+
     await database.create_shift_member(shift, user, False, False)
+
+    #await database.delete_shift(shift)
+    #print(user)
+    #await database.create_shift_member(shift, user, False, False)
+    #shifts = await database.fetch_month_shifts(date.today(), user)
+    print(shifts)
 
 
 if __name__ == '__main__':
