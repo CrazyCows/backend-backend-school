@@ -63,6 +63,7 @@ class Database:
                         role=result.get('role'))
             return user
 
+
 async def main():
     base_pool = await PoolUsersData().initialize_pool()
     database = Database()
