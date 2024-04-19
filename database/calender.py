@@ -126,7 +126,7 @@ async def main():
     )
     print(dummy_shift)
 
-    #await database.create_shift(dummy_shift)
+    await database.create_shift(dummy_shift)
 
     # Create a dummy user object
     test_user = User(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79")

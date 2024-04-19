@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Shifts for Month</title>
+</head>
+<body>
+    <h1>Fetch Shifts for a Specific Month</h1>
+    <button onclick="fetchShifts()">Fetch Shifts</button>
+    <p id="response"></p>
+
+    <script>
+        async function fetchShifts() {
+            const chosenDate = "2024-04-01"; // Example date in YYYY-MM-DD format
+
+            try {
+                const response = await fetch('http://localhost:8000/fetch-shifts-for-month/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chosen_date: chosenDate
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                document.getElementById('response').textContent = data.message;
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+                document.getElementById('response').textContent = 'Failed to fetch data.';
+            }
+        }
+    </script>
+</body>
+</html>

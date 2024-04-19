@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Request, Response, HTTPException
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
 from models.users_model import User, UserLogin, CreateUser
 from models.calender_model import Shift
 from controllers import simple_controller
@@ -20,6 +22,7 @@ def decrypt_data(data: str) -> str:
     return cipher.decrypt(data.encode()).decode()
 
 def get_cookie(request: Request):
+    pass
     encrypted_data = request.cookies.get("secure_cookie")
     if encrypted_data:
         decrypted_data = decrypt_data(encrypted_data)
@@ -90,11 +93,19 @@ async def fetch_shift(shift: Shift, request: Request):
     except:
         return JSONResponse(content={"message": "not successful fetching shift"}, status_code=403)
 
-@router.get("/fetch-shifts-for-month/")
-async def fetch_shifts_for_month(chosen_date: date, user: User, request: Request):
-    get_cookie(request)
+class ShiftRequest(BaseModel):
+    chosen_date: date  # Ensure the type and field name are correct
+
+@router.post("/fetch-shifts-for-month/")
+async def fetch_shifts_for_month(chosen_date: ShiftRequest, request: Request):
+    user = User(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79")
+    chosen_date = chosen_date.chosen_date
+    # get_cookie(request)
+
     try:
+        print("hi")
         month_calender = await controls.get_shifts_for_month(chosen_date, user)
+        print("hi")
         return JSONResponse(content={"message": "successfully fetched all shifts for month", "shifts": month_calender.dict()}, status_code=200)
     except:
         return JSONResponse(content={"message": "not successful fetching all shifts for month"}, status_code=403)
