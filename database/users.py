@@ -10,7 +10,6 @@ class Database:
     def __init__(self):
         self.pool = PoolUsersData()
 
-
     async def create_user(self, user: CreateUser) -> None:
         hashed_password, salt = Encryption().hash_password(user.password)
         async with self.pool.acquire() as conn:

@@ -12,6 +12,9 @@ class Controller(metaclass=SingletonMeta):
     async def create_user(self, user: CreateUser):
         await self.userdb.create_user(user)
 
+    async def update_user(self, user: User):
+        await self.userdb.update_user(user)
+
     async def login(self, user_login: UserLogin) -> User:
         user = await self.userdb.fetch_user(user_login)
         return user
@@ -24,6 +27,10 @@ class Controller(metaclass=SingletonMeta):
 
     async def create_shift(self, shift: Shift):
         await self.calenderdb.create_shift(shift)
+
+    async def update_shift(self, shift: Shift):
+        await self.calenderdb.update_shift(shift)
+
     async def get_shift(self, shift: Shift):
         shift = await self.calenderdb.fetch_shift(shift)
         return shift
@@ -34,3 +41,18 @@ class Controller(metaclass=SingletonMeta):
 
     async def delete_shift(self, shift: Shift):
         await self.calenderdb.delete_shift(shift)
+
+    async def create_shift_member(self, shift: Shift, user: User, wished: bool, assigned: bool):
+        await self.calenderdb.create_shift_member(shift, user, wished, assigned)
+
+    async def update_shift_member(self, shiftmember: ShiftMember):
+        await self.calenderdb.update_shift(shiftmember)
+
+    async def fetch_shift_member(self, shiftmember: ShiftMember):
+        shift_member = await self.calenderdb.fetch_shift_member(shiftmember)
+        return shift_member
+    async def fetch_all_shift_members(self, shift: Shift) -> list[ShiftMember]:
+        shift_members = await self.calenderdb.fetch_all_shift_members(shift)
+        return shift_members
+    async def delete_shift_member(self, shiftmember: ShiftMember):
+        await self.calenderdb.delete_shift_member(shiftmember)
