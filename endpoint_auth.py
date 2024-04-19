@@ -23,7 +23,7 @@ async def create_token_homebrew(response: Response, user = UserInfo):
     # I removed the database connections so it's just for show.
     # Before issuing a token the users credentials should be confirmed in the database
 
-    username = user.user_id
+    username = user.uid_user
     password = user.password
 
     ### *** INSERT DATABASE CHECKS *** ###

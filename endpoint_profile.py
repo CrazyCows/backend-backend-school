@@ -10,6 +10,7 @@ from datetime import date
 router = APIRouter()
 controls = simple_controller.Controller()
 
+# TODO: Discuss if this should return
 @router.post("/create-user/")
 async def create_user(user: Depends(CreateUser)):
     try:
@@ -27,6 +28,7 @@ async def fetch_user(user: Depends(UserLogin)):
     except:
         return JSONResponse(content={"not successful logging in user", 403})
 
+# TODO: Rewrite such it only takes in a cookie as argument and passes the UID for the user to delete a given user to improve security.
 @router.delete("/delete-user/")
 async def delete_user(user: Depends(User)):
     try:
@@ -38,13 +40,14 @@ async def delete_user(user: Depends(User)):
 @router.get("/fetch-all-users/")
 async def fetch_all_users():
     try:
-        await controls.get_all_users()
-        return JSONResponse(content={"successfully fetched all users", 200})
+        all_users = await controls.fetch_all_users()
+        all_users = [user.dict() for user in all_users]
+        return JSONResponse(content={"message": "successfully fetched all users", 'all_users': all_users}, status_code=200)
     except:
         return JSONResponse(content={"not successful deleting user", 403})
 
-@router.post("/creat-shift/")
-async def create_shift(shift: Depends(Shift)):
+@router.post("/create-shift/")
+async def create_shift(shift: Shift = Depends(Shift)):
     try:
         await controls.create_shift(shift)
         return JSONResponse(content={"successfully created shift", 200})
@@ -52,18 +55,18 @@ async def create_shift(shift: Depends(Shift)):
         return JSONResponse(content={"not successful creating shift", 403})
 
 @router.get("/fetch-shift/")
-async def fetch_shift(shift: Depends(Shift)):
+async def fetch_shift(shift: Shift = Depends(Shift)):
     try:
-        await controls.get_shift(shift)
-        return JSONResponse(content={"successfully fetched shift", 200})
+        _shift = await controls.get_shift(shift)
+        return JSONResponse(content={"message": "Successfully fetched shift", "shift": _shift.dict()}, status_code=200)
     except:
         return JSONResponse(content={"not successful fetching shift", 403})
 
 @router.get("/fetch-shifts-for-month/")
-async def fetch_all_users(date: Depends(date), user: Depends(User)):
+async def fetch_shifts_for_month(date: Depends(date), user: Depends(User)):
     try:
-        await controls.get_shifts_for_month(date, user)
-        return JSONResponse(content={"successfully fetched all shifts for month", 200})
+        month_shifts = await controls.get_shifts_for_month(date, user)
+        return JSONResponse(content={"message": "successfully fetched all shifts for month", "shifts": month_shifts.dict()}, status_code=200)
     except:
         return JSONResponse(content={"not successful fetching all shifts for month", 403})
 

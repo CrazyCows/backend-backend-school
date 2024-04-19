@@ -24,7 +24,7 @@ CREATE TABLE users(
 
 CREATE TABLE shifts(
     id SERIAL PRIMARY KEY,
-    shift_id uuid UNIQUE DEFAULT uuid_generate_v4(),
+    uid_shift uuid UNIQUE DEFAULT uuid_generate_v4(),
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL ,
     active BOOLEAN DEFAULT TRUE,
@@ -34,14 +34,14 @@ CREATE TABLE shifts(
 
 CREATE TABLE shift_member(
     id SERIAL PRIMARY KEY,
-    shift_id UUID REFERENCES shifts(shift_id),
-    user_id UUID REFERENCES users(uid_user),
+    uid_shift UUID REFERENCES shifts(uid_shift),
+    uid_user UUID REFERENCES users(uid_user),
     attendance BOOLEAN DEFAULT TRUE
 );
 
 
 CREATE OR REPLACE FUNCTION get_shifts_for_month(month_date DATE, users_id INTEGER) RETURNS TABLE (
-   shift_id INT,
+   uid_shift INT,
    start_time TIMESTAMP,
    end_time TIMESTAMP,
    active BOOLEAN,
@@ -49,9 +49,9 @@ CREATE OR REPLACE FUNCTION get_shifts_for_month(month_date DATE, users_id INTEGE
 ) AS $$
 BEGIN
    RETURN QUERY
-   SELECT shifts.shift_id, shifts.start_time, shifts.end_time, shifts.active,
-   CASE WHEN shift_member.user_id = users_id THEN TRUE ELSE FALSE END AS myShift
-   FROM shifts JOIN shift_member ON shifts.shift_id = shift_member.shift_id
+   SELECT shifts.uid_shift, shifts.start_time, shifts.end_time, shifts.active,
+   CASE WHEN shift_member.uid_user = users_id THEN TRUE ELSE FALSE END AS myShift
+   FROM shifts JOIN shift_member ON shifts.uid_shift = shift_member.uid_shift
    WHERE EXTRACT(YEAR FROM shifts.start_time) = EXTRACT(YEAR FROM month_date)
      AND EXTRACT(MONTH FROM shifts.start_time) = EXTRACT(MONTH FROM month_date);
 

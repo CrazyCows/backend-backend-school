@@ -50,7 +50,7 @@ class BasePool:
 # You can freely add more databases by copying PoolUsersData
 class PoolUsersData(BasePool, metaclass=SingletonMeta):
     def __init__(self):
-        super().__init__(database_name="user_data",
+        super().__init__(database_name="backend_school",
                          user="firstuser",
                          host="135.181.106.80",
                          password="Studyhard1234.",
