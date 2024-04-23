@@ -12,35 +12,40 @@
 
     <script>
         async function login_test() {
-            console.log("hey login started")
+            console.log("hey login started");
             const data = { username: "test", password: "<PASSWORD>" };
-            await fetch('http://localhost:8000/user-login/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data),
-                credentials: "include"
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('http://localhost:8000/user-login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    credentials: "include"
+                });
+                const jsonData = await response.json(); // Wait for JSON conversion
                 const responseMessage = document.getElementById('responseMessage');
-                if (data.message) {
-                    responseMessage.textContent = data.message;
+                if (jsonData.message) {
+                    responseMessage.textContent = jsonData.message;
                 } else {
                     responseMessage.textContent = 'Error logging in';
                 }
-            })
-            .catch(error => {
+                console.log("hey login stopped");
+            } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('responseMessage').textContent = 'Error logging in';
-            });
-            console.log("hey login stiopped")
+            }
         }
+
 
         async function fetchShifts() {
 
-            await login_test()
+            try {
+                await login_test()
+            }
+                catch (error) {
+            }
+
             console.log("hey fetch shift continues. ")
             const chosenDate = "2024-04-01"; // Example date in YYYY-MM-DD format
             try {
