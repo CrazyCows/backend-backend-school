@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Shifts for Month</title>
+</head>
+<body>
+    <h1>Fetch Shifts for a Specific Month</h1>
+    <button onclick="fetchShifts()">Fetch Shifts</button>
+    <p id="responseMessage"></p>
+
+    <script>
+
+        async function login_test() {
+            console.log("hey login started");
+            const data = { username: "test", password: "<PASSWORD>" };
+            try {
+                const response = await fetch('http://localhost:8000/user-login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    credentials: "include"
+                });
+                const jsonData = await response.json(); // Wait for JSON conversion
+                const responseMessage = document.getElementById('responseMessage');
+                if (jsonData.message) {
+                    responseMessage.textContent = jsonData.message;
+                } else {
+                    responseMessage.textContent = 'Error logging in';
+                }
+                console.log("hey login stopped");
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('responseMessage').textContent = 'Error logging in';
+            }
+        }
+
+
+        async function fetchShifts() {
+            const chosenDate = "2024-04-01"; // Example date in YYYY-MM-DD format
+            const data = { username: 'test', password: "<PASSWORD>" };
+
+            try {
+                await login_test()
+            } catch (error) {
+
+            }
+
+            try {
+                const loginResponse = await fetch('http://localhost:8000/user-login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    credentials: "include"
+                });
+
+                const loginData = await loginResponse.json();
+
+                if (!loginResponse.ok) {
+                    throw new Error('Error logging in');
+                }
+
+                const responseMessage = document.getElementById('responseMessage');
+                if (loginData.message) {
+                    responseMessage.textContent = loginData.message;
+                    console.log(loginData.shifts);
+                } else {
+                    throw new Error('Error logging in');
+                }
+            } catch (error) {
+                console.error('Login Error:', error);
+                document.getElementById('responseMessage').textContent = 'Error logging in';
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/fetch-shifts-for-month/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chosen_date: chosenDate,
+                        uid_shift: "b71d27fd-325c-4feb-b7a4-768f3defb05e"
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const shiftsData = await response.json();
+                document.getElementById('responseMessage').textContent = shiftsData.message;
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                document.getElementById('responseMessage').textContent = 'Failed to fetch data.';
+            }
+        }
+    </script>
+</body>
+</html>
