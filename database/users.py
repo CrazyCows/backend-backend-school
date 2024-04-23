@@ -49,6 +49,7 @@ class Database:
             params = [user.username, active_user.uid_user if active_user else None]
             result = await conn.fetchrow(query, *params)
 
+            # TODO: Refractor this, password check does not fit here
             if active_user is None:
                 correct_password = Encryption().verify_password(result.get('password'), user.password)
                 if correct_password is False:
@@ -62,6 +63,24 @@ class Database:
                         phone=result.get('phone'),
                         role=result.get('role'))
             return user
+
+    async def fetch_user_by_id(self, user: User) -> User:
+        async with self.pool.acquire() as conn:
+
+            query = "SELECT users.uid_user, users.name, users.email, users.phone, users.role FROM users WHERE users.uid_user=$1 AND users.active=TRUE"
+            params = user.uid_user
+            result = await conn.fetchrow(query, params)
+
+            if result is None:
+                raise Exception("user not found")
+
+            user = User(uid_user=str(result.get('uid_user')),
+                        name=result.get('name'),
+                        email=result.get('email'),
+                        phone=result.get('phone'),
+                        role=result.get('role'))
+            return user
+
 
 
 async def main():

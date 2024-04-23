@@ -28,11 +28,17 @@ def get_cookie(request: Request):
         return decrypted_data # Should be userId (for the love of god)
     raise HTTPException(status_code=403)
 
+async def is_user_admin(request: Request):
+    uid_user = get_cookie(request)
+    user = User(uid_user=uid_user)
+    user = await controls.check_user_active(user)
+    if user.role != "admin":
+        raise HTTPException(status_code=403)
 
 # TODO: Discuss if this should return
 @router.post("/create-user/")
 async def create_user(user: CreateUser, request: Request):
-    get_cookie(request)
+    await is_user_admin(request)
     try:
         await controls.create_user(user)
         return JSONResponse(content={"message": "successfully created user"}, status_code=201)
@@ -43,7 +49,6 @@ async def create_user(user: CreateUser, request: Request):
 @router.post("/user-login/")
 async def user_login(user: UserLogin, response: Response):
     try:
-
         current_user = await controls.login(user)
         data = current_user.uid_user
         encrypted_data = encrypt_data(data)
@@ -56,7 +61,7 @@ async def user_login(user: UserLogin, response: Response):
 # TODO: Rewrite such it only takes in a cookie as argument and passes the UID for the user to delete a given user to improve security.
 @router.delete("/delete-user/")
 async def delete_user(user: User, request: Request):
-    get_cookie(request)
+    await is_user_admin(request)
     try:
         await controls.delete_user(user)
         return JSONResponse(content={"message": "successfully deleted user"}, status_code=200)
@@ -75,7 +80,7 @@ async def fetch_all_users(request: Request):
 
 @router.post("/create-shift/")
 async def create_shift(shift: Shift, request: Request):
-    get_cookie(request)
+    await is_user_admin(request)
     try:
         await controls.create_shift(shift)
         return JSONResponse(content={"message": "successfully created shift"}, status_code=200)
@@ -96,9 +101,9 @@ class ShiftRequest(BaseModel):
 
 @router.post("/fetch-shifts-for-month/")
 async def fetch_shifts_for_month(chosen_date: ShiftRequest, request: Request):
-    user = User(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79")
     chosen_date = chosen_date.chosen_date
-    get_cookie(request)
+    uid_user = get_cookie(request)
+    user = User(uid_user=uid_user)
 
     try:
         print("hi")
@@ -110,7 +115,7 @@ async def fetch_shifts_for_month(chosen_date: ShiftRequest, request: Request):
 
 @router.delete("/delete-shift/")
 async def delete_shift(shift: Shift, request: Request):
-    get_cookie(request)
+    await is_user_admin(request)
     try:
         await controls.delete_shift(shift)
         return JSONResponse(content={"message": "successfully deleted shift"}, status_code=200)
