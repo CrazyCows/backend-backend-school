@@ -98,7 +98,7 @@ class ShiftRequest(BaseModel):
 async def fetch_shifts_for_month(chosen_date: ShiftRequest, request: Request):
     user = User(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79")
     chosen_date = chosen_date.chosen_date
-    # get_cookie(request)
+    get_cookie(request)
 
     try:
         print("hi")
