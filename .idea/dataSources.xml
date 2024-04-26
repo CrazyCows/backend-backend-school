@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://135.181.106.80:5432/backend_school</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="backend_school@localhost" uuid="6c14f09f-6788-4b5e-9fb5-cd81d4e4c21a">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/backend_school</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
