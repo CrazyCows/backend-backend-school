@@ -18,7 +18,7 @@ class Shift(BaseModel):
     wished_shift_members: Optional[List[ShiftMember]] = None
     actual_shift_members: Optional[List[ShiftMember]] = None
     active: Optional[bool] = None
-    description: Optional[str] = None
+    myShift: Optional[bool] = None
 
 class Calender(BaseModel):
     shifts: List[Shift]
