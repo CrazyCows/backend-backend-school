@@ -2,6 +2,7 @@ FROM python:3.11.9-slim-bullseye
 
 # Install system dependencies
 RUN apt-get update \
+    && apt-get install -y nginx \
     && apt-get install -y gcc git tree \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -18,6 +19,8 @@ WORKDIR /app
 # Copy source code
 COPY src/ src/
 COPY requirements.txt requirements.txt
+COPY nginx/default/ /etc/nginx/sites-available/
+COPY nginx/default/ /etc/nginx/sites-enabled/
 
 # Fix missing README.md for poetry package
 RUN if [ ! -f README.md ]; then echo "Placeholder README" > README.md; fi

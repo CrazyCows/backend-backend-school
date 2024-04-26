@@ -1,6 +1,8 @@
 version: "3.9"
 
 services:
+
+
   app:
     build:
       context: .
@@ -15,12 +17,22 @@ services:
       db:
         condition: service_healthy
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"  # Expose HTTP
+      - "443:443"  # Expose HTTPS if you're using SSL
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
   db:
     image: postgres:13.4-buster
     hostname: backend_school
     container_name: backend_postgres
     ports:
-      - "5432:5432"
+      - "5432"
     environment:
       POSTGRES_PASSWORD: "Studyhard1234."
       POSTGRES_USER: "firstuser"
@@ -39,5 +51,5 @@ services:
       retries: 40
 
 volumes:
-  aibroker-db-data:
+  calender-backend:
     name: calender-backend
