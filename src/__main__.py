@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database.conn_pool import PoolUsersData
-from endpoint_profile import router as profile
-from contextlib import asynccontextmanager
+from src.database.conn_pool import PoolUsersData
+from src.endpoint_profile import router as profile
 
 # This starts the app and adds the routers to it
 app = FastAPI()

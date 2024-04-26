@@ -1,0 +1,8 @@
+FROM python:3.10.8-slim-buster
+# Required for Dockerfile.deploy.dockerignore: `export DOCKER_BUILDKIT=1`
+
+# Install gcc
+RUN apt-get update \
+    && apt-get install gcc -y
+
+CMD ["/usr/local/bin/python", "-m", "src"]

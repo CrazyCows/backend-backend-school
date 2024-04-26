@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./deploy/docker/Dockerfile
+    image: pact-meridian:${PACT_MERIDIAN_VERSION:-latest}
+    restart: always
+    env_file:
+      - .env
+    environment:
+      DB_POSTGRESS_HOST: "backend_school:5432"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:13.4-buster
+    hostname: backend_school
+    container_name: backend_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "Studyhard1234."
+      POSTGRES_USER: "firstuser"
+      POSTGRES_DB: "backend_school"
+    restart: always
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - -U
+        - firstuser  # Changed from backend_school to firstuser to reflect the actual role name
+        - -d
+        - backend_school
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+volumes:
+  aibroker-db-data:
+    name: calender-backend

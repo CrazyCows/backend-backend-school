@@ -1,0 +1,10 @@
+# For running the non-local dev deployment
+
+version: '3.9'
+
+services:
+  api:
+    ports:
+      - "8000:8000"
+    environment:
+      SRC_ENV: "dev"

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Request, Response, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from models.users_model import User, UserLogin, CreateUser
-from models.calender_model import Shift
-from controllers import simple_controller
+from src.models.users_model import User, UserLogin, CreateUser
+from src.models.calender_model import Shift
+from src.controllers import simple_controller
 from datetime import date
 from cryptography.fernet import Fernet
 
