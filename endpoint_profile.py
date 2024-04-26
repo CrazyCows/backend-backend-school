@@ -22,14 +22,22 @@ def decrypt_data(data: str) -> str:
     return cipher.decrypt(data.encode()).decode()
 
 def get_cookie(request: Request):
+    print("getting encrypted cookie")
     encrypted_data = request.cookies.get("secure_cookie")
+    print(encrypted_data)
+    print("got encrypted cookie")
     if encrypted_data:
         decrypted_data = decrypt_data(encrypted_data)
+        print(decrypted_data)
+        print("should be uid")
         return decrypted_data # Should be userId (for the love of god)
     raise HTTPException(status_code=403)
 
 async def is_user_admin(request: Request):
+    print("getcookie yes?")
     uid_user = get_cookie(request)
+    print(uid_user)
+    print("getcookie works:)")
     user = User(uid_user=uid_user)
     user = await controls.check_user_active(user)
     if user.role != "admin":
@@ -38,7 +46,9 @@ async def is_user_admin(request: Request):
 # TODO: Discuss if this should return
 @router.post("/create-user/")
 async def create_user(user: CreateUser, request: Request):
+    print("is admin ----------")
     await is_user_admin(request)
+    print("admin ok ----------")
     try:
         await controls.create_user(user)
         return JSONResponse(content={"message": "successfully created user"}, status_code=201)
@@ -70,7 +80,7 @@ async def delete_user(user: User, request: Request):
 
 @router.get("/fetch-all-users/")
 async def fetch_all_users(request: Request):
-    get_cookie(request)
+    await get_cookie(request)
     try:
         all_users = await controls.fetch_all_users()
         all_users = [user.dict() for user in all_users]
@@ -104,7 +114,6 @@ async def fetch_shifts_for_month(chosen_date: ShiftRequest, request: Request):
     chosen_date = chosen_date.chosen_date
     uid_user = get_cookie(request)
     user = User(uid_user=uid_user)
-
     try:
         print("hi")
         month_calender = await controls.get_shifts_for_month(chosen_date, user)

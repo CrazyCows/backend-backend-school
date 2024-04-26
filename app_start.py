@@ -9,7 +9,8 @@ app = FastAPI()
 
 # Allows connections from specific endpoints. Is required to connect from a browser
 origins = [
-    "http://localhost:63342",  # Assuming you're using http and not https
+    "http://localhost:63342",
+    "http://localhost:63343"# Assuming you're using http and not https
 ]
 
 # Cors middleware - it allows for setting cookies in browser

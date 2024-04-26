@@ -14,15 +14,17 @@ class Database:
     async def create_user(self, user: CreateUser) -> None:
         hashed_password, salt = Encryption().hash_password(user.password)
         async with self.pool.acquire() as conn:
-            create_statement = ("INSERT INTO users(name, email, phone, role, username, password, salt) "
-                                "VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT DO NOTHING")
-            params = [user.name, user.email, user.phone, user.role, user.username, hashed_password, salt]
+            create_statement = ("INSERT INTO users(name, email, phone, role, username, password) "
+                                "VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING")
+            params = [user.name, user.email, user.phone, user.role, user.username, hashed_password]
             await conn.execute(create_statement, *params)
 
     async def update_user(self, user: User) -> None:
         async with self.pool.acquire() as conn:
             update_statement = "UPDATE users SET name = $2, email = $3, phone = $4, role = $5 WHERE uid_user=$1"
             params = [user.uid_user, user.name, user.email, user.phone, user.role]
+            print(update_statement)
+            print(*params)
             await conn.execute(update_statement, *params)
 
     async def delete_user(self, user: User) -> None:
@@ -44,11 +46,10 @@ class Database:
 
     async def fetch_user(self, user: UserLogin, active_user: User = None) -> User:
         async with self.pool.acquire() as conn:
-
             query = "SELECT users.password, users.uid_user, users.name, users.email, users.phone, users.role FROM users WHERE users.username=$1 or users.uid_user=$2"
             params = [user.username, active_user.uid_user if active_user else None]
             result = await conn.fetchrow(query, *params)
-
+            print(result)
             # TODO: Refractor this, password check does not fit here
             if active_user is None:
                 correct_password = Encryption().verify_password(result.get('password'), user.password)
@@ -67,7 +68,7 @@ class Database:
     async def fetch_user_by_id(self, user: User) -> User:
         async with self.pool.acquire() as conn:
 
-            query = "SELECT users.uid_user, users.name, users.email, users.phone, users.role FROM users WHERE users.uid_user=$1 AND users.active=TRUE"
+            query = "SELECT users.uid_user, users.name, users.email, users.phone, users.role FROM users WHERE users.uid_user=$1"
             params = user.uid_user
             result = await conn.fetchrow(query, params)
 

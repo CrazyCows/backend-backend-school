@@ -24,7 +24,7 @@ class Controller(metaclass=SingletonMeta):
 
     async def check_user_active(self, user: User) -> User:
         user = await self.userdb.fetch_user_by_id(user)
-
+        return user
 
     async def fetch_all_users(self) -> list[User]:
         return await self.userdb.fetch_all_users()

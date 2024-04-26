@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create User</title>
+</head>
+<body>
+    <h1>Create User</h1>
+    <button onclick="createUser()">Create User</button>
+    <p id="response"></p>
+
+    <script>
+        async function login_test() {
+            console.log("hey login started");
+            const data = { username: "test", password: "<PASSWORD>" };
+            try {
+                const response = await fetch('http://localhost:8000/user-login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    credentials: "include"
+                });
+                const jsonData = await response.json(); // Wait for JSON conversion
+                const responseMessage = document.getElementById('responseMessage');
+                if (jsonData.message) {
+                    responseMessage.textContent = jsonData.message;
+                } else {
+                    responseMessage.textContent = 'Error logging in';
+                }
+                console.log("hey login stopped");
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('responseMessage').textContent = 'Error logging in';
+            }
+        }
+        async function createUser() {
+            try {
+                await login_test()
+            }
+                catch (error) {
+                console.log("det gik jo fuldstændigt galt")
+            }
+            console.log("Creating user...");
+
+            // Create a user object based on the CreateUser class
+            const user = {
+                name: "John Doe",
+                email: "john@example.com",
+                phone: "1234567890",
+                role: "coworker",
+                username: "johndoe",
+                password: "password123"
+            };
+
+            console.log("Sending user")
+            try {
+                const response = await fetch('http://localhost:8000/create-user/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(user),
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data); // Assuming data contains response from the server
+                document.getElementById('response').textContent = data.message; // Adjust as needed
+            } catch (error) {
+                console.error('There was a problem with the create user operation:', error);
+                document.getElementById('response').textContent = 'Failed to create user.';
+            }
+        }
+    </script>
+</body>
+</html>
