@@ -1,10 +1,21 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.database.conn_pool import PoolUsersData
 from src.endpoint_profile import router as profile
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load the ML model
+
+    await PoolUsersData().initialize_pool()
+    yield
+    # Clean up the ML models and release the resources
+    await PoolUsersData().close()
+
 # This starts the app and adds the routers to it
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 # Allows connections from specific endpoints. Is required to connect from a browser
 origins = [
@@ -21,13 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"]
 )
-
-
-
-@app.on_event("startup")
-async def startup_event():
-    await PoolUsersData().initialize_pool()
-
 
 app.include_router(profile, prefix="")
 
