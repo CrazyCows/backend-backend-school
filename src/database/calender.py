@@ -3,7 +3,7 @@ import asyncio
 from src.database.conn_pool import PoolUsersData
 from src.models.calender_model import Shift, Calender, ShiftMember
 from datetime import date, datetime
-from models import db, shifts, shift_member, users, clearence_lvl
+from src.database.models import db, shifts, shift_member, users, clearence_lvl
 from src.models.users_model import User
 
 

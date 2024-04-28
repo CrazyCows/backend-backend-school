@@ -4,7 +4,7 @@ from src.database.conn_pool import PoolUsersData
 from src.models.users_model import User, UserLogin, CreateUser
 from src.helpers.password_encrypt import Encryption
 from typing import List
-from models import users, db
+from src.database.models import users, db
 from datetime import datetime
 
 # This is just an example to show how to use the pool and the database connection - database does not exist yet
