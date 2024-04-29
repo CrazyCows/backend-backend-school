@@ -16,7 +16,6 @@ async def lifespan(app: FastAPI):
     # Clean up the ML models and release the resources
     await PoolUsersData().close()
 
-
 # This starts the app and adds the routers to it
 app = FastAPI(lifespan=lifespan)
 
@@ -33,7 +32,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
+    expose_headers=["*"]
 )
 
 app.include_router(profile, prefix="")
@@ -41,3 +40,4 @@ app.include_router(profile, prefix="")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

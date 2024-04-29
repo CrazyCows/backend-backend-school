@@ -1,6 +1,10 @@
 import asyncpg
 from src.helpers.singleton import SingletonMeta
 from contextlib import asynccontextmanager
+import peewee_async
+
+peewee_async = peewee_async.PostgresqlDatabase()
+
 
 # Universal database creator.
 # Don't think too much about this class, just be happy it exists.
@@ -24,7 +28,7 @@ class BasePool:
                 host=self.host,
                 password=self.password,
                 min_size=self.min_size,
-                max_size=self.max_size
+                max_size=self.max_size,
             )
         return BasePool._pools[pool_key]
 
@@ -50,9 +54,11 @@ class BasePool:
 # You can freely add more databases by copying PoolUsersData
 class PoolUsersData(BasePool, metaclass=SingletonMeta):
     def __init__(self):
-        super().__init__(database_name="backend_school",
-                         user="firstuser",
-                         host="135.181.106.80",
-                         password="Studyhard1234.",
-                         min_size=1,
-                         max_size=20)
+        super().__init__(
+            database_name="backend_school",
+            user="firstuser",
+            host="135.181.106.80",
+            password="Studyhard1234.",
+            min_size=1,
+            max_size=20,
+        )

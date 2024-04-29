@@ -7,6 +7,7 @@ from typing import List
 from src.database.models import users, db
 from datetime import datetime
 
+
 # This is just an example to show how to use the pool and the database connection - database does not exist yet
 # Transactions is used for deletes and inserts to prevent the data from being read when modified.
 class Database:
@@ -27,17 +28,18 @@ class Database:
                 registration=datetime.now(),
                 last_modified=datetime.now(),
                 salt=salt,
-                password=hashed_password
+                password=hashed_password,
             )
 
     async def update_user(self, user: User) -> None:
         async with db.atomic_async():
-            await users.update(
-                name=user.name,
-                email=user.email,
-                phone=user.phone,
-                role=user.role
-            ).where(users.uid_user == user.uid_user).execute()
+            await (
+                users.update(
+                    name=user.name, email=user.email, phone=user.phone, role=user.role
+                )
+                .where(users.uid_user == user.uid_user)
+                .execute()
+            )
 
     async def delete_user(self, user: User) -> None:
         async with db.atomic_async():
@@ -50,13 +52,15 @@ class Database:
 
     async def fetch_user(self, user: UserLogin, active_user: User = None) -> User:
         async with db.atomic_async():
-            user_query = (users
-                          .select()
-                          .where((users.username == user.username) | (users.uid_user == user.uid_user)))
+            user_query = users.select().where(
+                (users.username == user.username) | (users.uid_user == user.uid_user)
+            )
 
             if active_user is None:
                 user = await user_query.get()
-                correct_password = Encryption().verify_password(user.password, user.password)
+                correct_password = Encryption().verify_password(
+                    user.password, user.password
+                )
                 if not correct_password:
                     raise Exception("Incorrect password")
                 return user
@@ -71,25 +75,31 @@ class Database:
                 raise Exception("User not found")
             return user
 
+
 async def main():
     base_pool = await PoolUsersData().initialize_pool()
     database = Database()
 
-    '''
+    """
     name: str
     email: str
     phone: Optional[str] = None
     role: str
     username: str
-    password: str'''
-    create_user = CreateUser(name="test", email="<MAIL>", phone="<PHONE>", role="admin", username="test",
-                             password="<PASSWORD>")
+    password: str"""
+    create_user = CreateUser(
+        name="test",
+        email="<MAIL>",
+        phone="<PHONE>",
+        role="admin",
+        username="test",
+        password="<PASSWORD>",
+    )
 
     user_login = UserLogin(username="test", password="<PASSWORD>")
 
     print(await database.fetch_user(user_login))
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

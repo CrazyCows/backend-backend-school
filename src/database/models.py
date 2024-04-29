@@ -1,11 +1,16 @@
 import datetime
 
-from peewee import *
+from peewee import PostgresqlDatabase
 import uuid
 
 # Database connection
-db = PostgresqlDatabase('backend_school', user='firstuser', password='Studyhard1234.',
-                        host='localhost', port=5432)
+db = PostgresqlDatabase(
+    "backend_school",
+    user="firstuser",
+    password="Studyhard1234.",
+    host="localhost",
+    port=5432,
+)
 
 get_shift_for_month_function_query = function_query = """
     CREATE OR REPLACE FUNCTION get_shifts_for_month(month_date DATE, users_id INTEGER) RETURNS TABLE (
@@ -25,6 +30,7 @@ get_shift_for_month_function_query = function_query = """
     END;
     $$ LANGUAGE plpgsql;
 """
+
 
 # Define your base model class from which all tables will inherit
 class BaseModel(Model):
@@ -46,7 +52,7 @@ class users(BaseModel):
     name = CharField(max_length=255)
     email = CharField(max_length=255, unique=True)
     phone = CharField(max_length=8, unique=True)
-    role = ForeignKeyField(clearence_lvl, to_field='role', on_delete='CASCADE')
+    role = ForeignKeyField(clearence_lvl, to_field="role", on_delete="CASCADE")
     username = CharField(unique=True, max_length=255)
     last_login = DateTimeField(datetime.datetime.now())
     registration = DateTimeField(datetime.datetime.now())
@@ -66,8 +72,8 @@ class shifts(BaseModel):
 
 class shift_member(BaseModel):
     id = AutoField(primary_key=True)
-    uid_shift = ForeignKeyField(shifts, to_field='uid_shift', on_delete='CASCADE')
-    uid_user = ForeignKeyField(users, to_field='uid_user', on_delete='CASCADE')
+    uid_shift = ForeignKeyField(shifts, to_field="uid_shift", on_delete="CASCADE")
+    uid_user = ForeignKeyField(users, to_field="uid_user", on_delete="CASCADE")
     attendance = BooleanField(default=False)
     wished = BooleanField(default=False)
     assigned = BooleanField(default=False)
@@ -77,11 +83,14 @@ def create_tables():
     with db:
         db.create_tables([clearence_lvl, users, shifts, shift_member])
 
+
 def create_function():
     with db:
         db.execute_sql(get_shift_for_month_function_query)
 
+
 # Main execution logic
-if __name__ == '__main__':
+if __name__ == "__main__":
+    create_tables()
     create_function()
     # You can add instances here or perform other database operations

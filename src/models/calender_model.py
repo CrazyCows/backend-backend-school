@@ -7,9 +7,12 @@ from src.models.users_model import User
 
 
 class ShiftMember(User):
-    attendance: Optional[str] = None #Attended the shift or skipped work/got sick
-    wished: Optional[bool] = None #wished for the shift or not, to be prioritised
-    active_member: Optional[bool] = None #true if the member has been assigned the shift
+    attendance: Optional[str] = None  # Attended the shift or skipped work/got sick
+    wished: Optional[bool] = None  # wished for the shift or not, to be prioritised
+    active_member: Optional[bool] = (
+        None  # true if the member has been assigned the shift
+    )
+
 
 class Shift(BaseModel):
     uid_shift: Optional[str] = None
@@ -20,10 +23,12 @@ class Shift(BaseModel):
     active: Optional[bool] = None
     myShift: Optional[bool] = None
 
+
 class Calender(BaseModel):
     shifts: List[Shift]
     month: str
     year: str
+
 
 class Clearnce_lvl(BaseModel):
     id_actual: str

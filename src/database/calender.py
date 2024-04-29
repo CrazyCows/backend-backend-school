@@ -12,6 +12,7 @@ from src.models.users_model import User
 class Database:
     def __init__(self):
         self.pool = PoolUsersData()
+
     async def create_shift(self, shift: Shift) -> None:
         # Assuming you have already connected to your database before calling this method
         async with db.atomic_async():
@@ -20,7 +21,7 @@ class Database:
                 start_time=shift.start_time,
                 end_time=shift.end_time,
                 active=shift.active,
-                creation_date=datetime.now()
+                creation_date=datetime.now(),
             )
 
     async def update_shift(self, shift: Shift) -> None:
@@ -28,7 +29,7 @@ class Database:
             query = shifts.update(
                 start_time=shift.start_time,
                 end_time=shift.end_time,
-                active=shift.active
+                active=shift.active,
             ).where(shifts.uid_shift == shift.uid_shift)
             await db.execute(query)
 
@@ -50,27 +51,30 @@ class Database:
             """
             rows = await db.execute_sql(query, (date, user.uid_user))
 
-            shifts = [Shift(
-                uid_shift=row[0],
-                start_time=row[1],
-                end_time=row[2],
-                active=row[3],
-                myShift=row[4]
-            ) for row in rows]
+            shifts = [
+                Shift(
+                    uid_shift=row[0],
+                    start_time=row[1],
+                    end_time=row[2],
+                    active=row[3],
+                    myShift=row[4],
+                )
+                for row in rows
+            ]
 
             return Calender(
-                shifts=shifts,
-                month=date.strftime("%B"),
-                year=str(date.year)
+                shifts=shifts, month=date.strftime("%B"), year=str(date.year)
             )
 
-    async def create_shift_member(self, shift: Shift, user: User, wished: bool, assigned: bool):
+    async def create_shift_member(
+        self, shift: Shift, user: User, wished: bool, assigned: bool
+    ):
         async with db.atomic_async():
             await shift_member.create(
                 uid_shift=shift.uid_shift,
                 uid_user=user.uid_user,
                 wished=wished,
-                assigned=assigned
+                assigned=assigned,
             )
 
     async def update_shift_member(self, shiftmember: ShiftMember):
@@ -78,18 +82,18 @@ class Database:
             query = shift_member.update(
                 attendance=shiftmember.attendance,
                 wished=shiftmember.wished,
-                assigned=shiftmember.assigned
+                assigned=shiftmember.assigned,
             ).where(
-                (shift_member.uid_shift == shiftmember.uid_shift) &
-                (shift_member.uid_user == shiftmember.uid_user)
+                (shift_member.uid_shift == shiftmember.uid_shift)
+                & (shift_member.uid_user == shiftmember.uid_user)
             )
             await db.execute(query)
 
     async def fetch_shift_member(self, shiftmember: ShiftMember):
         async with db.atomic_async():
             return await shift_member.get_or_none(
-                (shift_member.uid_shift == shiftmember.uid_shift) &
-                (shift_member.uid_user == shiftmember.uid_user)
+                (shift_member.uid_shift == shiftmember.uid_shift)
+                & (shift_member.uid_user == shiftmember.uid_user)
             )
 
     async def fetch_all_shift_members(self, shift: Shift) -> list[ShiftMember]:
@@ -99,10 +103,11 @@ class Database:
     async def delete_shift_member(self, shiftmember: ShiftMember):
         async with db.atomic_async():
             query = shift_member.delete().where(
-                (shift_member.uid_shift == shiftmember.uid_shift) &
-                (shift_member.uid_user == shiftmember.uid_user)
+                (shift_member.uid_shift == shiftmember.uid_shift)
+                & (shift_member.uid_user == shiftmember.uid_user)
             )
             await db.execute(query)
+
 
 async def main():
     base_pool = await PoolUsersData().initialize_pool()
@@ -118,7 +123,7 @@ async def main():
         wished_shift_members=[member1, member2],
         actual_shift_members=[member1],
         active=True,
-        description="Morning shift"
+        description="Morning shift",
     )
     print(dummy_shift)
 
@@ -136,5 +141,5 @@ async def main():
     print(calender)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

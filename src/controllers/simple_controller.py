@@ -7,6 +7,7 @@ from src.models.users_model import User, UserLogin, CreateUser
 from src.helpers.singleton import SingletonMeta
 from datetime import date
 
+
 class Controller(metaclass=SingletonMeta):
     def __init__(self):
         self.userdb = users.Database()
@@ -24,7 +25,6 @@ class Controller(metaclass=SingletonMeta):
 
     async def check_user_active(self, user: User) -> User:
         user = await self.userdb.fetch_user_by_id(user)
-
 
     async def fetch_all_users(self) -> list[User]:
         return await self.userdb.fetch_all_users()
@@ -50,7 +50,9 @@ class Controller(metaclass=SingletonMeta):
     async def delete_shift(self, shift: Shift):
         await self.calenderdb.delete_shift(shift)
 
-    async def create_shift_member(self, shift: Shift, user: User, wished: bool, assigned: bool):
+    async def create_shift_member(
+        self, shift: Shift, user: User, wished: bool, assigned: bool
+    ):
         await self.calenderdb.create_shift_member(shift, user, wished, assigned)
 
     async def update_shift_member(self, shiftmember: ShiftMember):
@@ -59,9 +61,11 @@ class Controller(metaclass=SingletonMeta):
     async def fetch_shift_member(self, shiftmember: ShiftMember):
         shift_member = await self.calenderdb.fetch_shift_member(shiftmember)
         return shift_member
+
     async def fetch_all_shift_members(self, shift: Shift) -> list[ShiftMember]:
         shift_members = await self.calenderdb.fetch_all_shift_members(shift)
         return shift_members
+
     async def delete_shift_member(self, shiftmember: ShiftMember):
         await self.calenderdb.delete_shift_member(shiftmember)
 
@@ -73,6 +77,6 @@ async def main():
     print(user_login)
     await controller.login(user_login)
 
-if __name__ == '__main__':
-    asyncio.run(main())
 
+if __name__ == "__main__":
+    asyncio.run(main())
