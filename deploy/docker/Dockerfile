@@ -24,6 +24,7 @@ COPY requirements.txt requirements.txt
 # Fix missing README.md for poetry package
 RUN if [ ! -f README.md ]; then echo "Placeholder README" > README.md; fi
 
+run pip install uvicorn
 # Install project dependencies
 RUN pip install -r requirements.txt
 
