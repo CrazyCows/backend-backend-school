@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pact-meridian"
+version = "0.1.0"
+description = "A python project based off template."
+authors = []
+maintainers = []
+readme = "README.md"
+packages = [{ include = "src", from = "." }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.6.4"
+quantlib = "^1.33"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.29"}
+openai = "^1.16.2"
+pydantic-settings = "^2.2.1"
+asyncpg = "^0.29.0"
+psycopg2-binary = "^2.9.9"

@@ -1,28 +1,62 @@
-import datetime
-from peewee import (
-    PostgresqlDatabase,
-    Model,
-    AutoField,
-    UUIDField,
-    DateTimeField,
-    CharField,
-    BinaryUUIDField,
-    BooleanField,
-    ForeignKeyField,
-)
-
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from src.database.conn_pool import get_db_session, engine
 import uuid
+import datetime
 
-# Database connection
-db = PostgresqlDatabase(
-    "backend_school",
-    user="firstuser",
-    password="Studyhard1234.",
-    host="localhost",
-    port=5432,
-)
+Base = declarative_base()
 
-get_shift_for_month_function_query = function_query = """
+
+class ClearanceLevel(Base):
+    __tablename__ = "clearance_levels"
+    id = Column(Integer, primary_key=True)
+    uid_clearance = Column(String, unique=True, default=lambda: str(uuid.uuid4()))
+    role = Column(String(100), unique=True, nullable=False)
+    creation_date = Column(DateTime, default=datetime.datetime.now)
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    uid_user = Column(String, unique=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String(255), nullable=False)
+    email = Column(String(255), unique=True, nullable=False)
+    phone = Column(String(8), unique=True, nullable=False)
+    role_id = Column(Integer, ForeignKey("clearance_levels.id"), nullable=False)
+    username = Column(String(255), unique=True)
+    last_login = Column(DateTime, default=datetime.datetime.now)
+    registration = Column(DateTime, default=datetime.datetime.now)
+    last_modified = Column(DateTime, default=datetime.datetime.now)
+    salt = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+    role = relationship("ClearanceLevel")
+
+
+class Shift(Base):
+    __tablename__ = "shifts"
+    id = Column(Integer, primary_key=True)
+    uid_shift = Column(String, unique=True, default=lambda: str(uuid.uuid4()))
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=False)
+    active = Column(Boolean, default=True)
+    creation_date = Column(DateTime, default=datetime.datetime.now)
+
+
+class ShiftMember(Base):
+    __tablename__ = "shift_members"
+    id = Column(Integer, primary_key=True)
+    shift_id = Column(Integer, ForeignKey("shifts.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    attendance = Column(Boolean, default=False)
+    wished = Column(Boolean, default=False)
+    assigned = Column(Boolean, default=False)
+    shift = relationship("Shift")
+    user = relationship("User")
+
+
+def create_function(session):
+    function_sql = text("""
     CREATE OR REPLACE FUNCTION get_shifts_for_month(month_date DATE, users_id INTEGER) RETURNS TABLE (
        shift_id INT,
        start_time TIMESTAMP,
@@ -32,102 +66,21 @@ get_shift_for_month_function_query = function_query = """
     ) AS $$
     BEGIN
        RETURN QUERY
-       SELECT shifts.shift_id, shifts.start_time, shifts.end_time, shifts.active,
-       CASE WHEN shift_member.user_id = users_id THEN TRUE ELSE FALSE END AS myShift
-       FROM shifts JOIN shift_member ON shifts.shift_id = shift_member.shift_id
+       SELECT shifts.id, shifts.start_time, shifts.end_time, shifts.active,
+       CASE WHEN shift_members.user_id = users_id THEN TRUE ELSE FALSE END AS myShift
+       FROM shifts JOIN shift_members ON shifts.id = shift_members.shift_id
        WHERE EXTRACT(YEAR FROM shifts.start_time) = EXTRACT(YEAR FROM month_date)
          AND EXTRACT(MONTH FROM shifts.start_time) = EXTRACT(MONTH FROM month_date);
     END;
     $$ LANGUAGE plpgsql;
-"""
+    """)
+
+    with session as active_session:
+        active_session.execute(function_sql)
+        active_session.commit()
 
 
-# Define your base model class from which all tables will inherit
-class BaseModel(Model):
-    class Meta:
-        database = db
-
-
-class clearence_lvl(BaseModel):
-    id = AutoField(primary_key=True)
-    uid_clearance = UUIDField(
-        unique=True,
-        null=False,
-        default=uuid.uuid4,
-    )
-    role = CharField(
-        null=False,
-        max_length=100,
-        unique=True,
-    )
-    creation_date = DateTimeField(datetime.datetime.now())
-
-
-# Define a simple User table
-class users(BaseModel):
-    id = AutoField(primary_key=True)
-    uid_user = UUIDField(unique=True)  # uuid_generate???
-    name = CharField(max_length=255)
-    email = CharField(max_length=255, unique=True)
-    phone = CharField(max_length=8, unique=True)
-    role = ForeignKeyField(
-        clearence_lvl,
-        to_field="role",
-        on_delete="CASCADE",
-    )
-    username = CharField(unique=True, max_length=255)
-    last_login = DateTimeField(datetime.datetime.now())
-    registration = DateTimeField(datetime.datetime.now())
-    last_modified = DateTimeField(datetime.datetime.now())
-    salt = BinaryUUIDField()
-    password = BinaryUUIDField()
-
-
-class shifts(BaseModel):
-    id = AutoField(primary_key=True)
-    uid_shift = UUIDField(unique=True)
-    start_time = DateTimeField()
-    end_time = DateTimeField()
-    active = BooleanField()
-    creation_date = DateTimeField(datetime.datetime.now())
-
-
-class shift_member(BaseModel):
-    id = AutoField(primary_key=True)
-    uid_shift = ForeignKeyField(
-        shifts,
-        to_field="uid_shift",
-        on_delete="CASCADE",
-    )
-    uid_user = ForeignKeyField(
-        users,
-        to_field="uid_user",
-        on_delete="CASCADE",
-    )
-    attendance = BooleanField(default=False)
-    wished = BooleanField(default=False)
-    assigned = BooleanField(default=False)
-
-
-def create_tables():
-    with db:
-        db.create_tables(
-            [
-                clearence_lvl,
-                users,
-                shifts,
-                shift_member,
-            ]
-        )
-
-
-def create_function():
-    with db:
-        db.execute_sql(get_shift_for_month_function_query)
-
-
-# Main execution logic
 if __name__ == "__main__":
-    create_tables()
-    create_function()
-    # You can add instances here or perform other database operations
+    session = get_db_session()
+    Base.metadata.create_all(engine)
+    create_function(session)

@@ -1,76 +1,83 @@
-import asyncpg
-from src.helpers.singleton import (
-    SingletonMeta,
+from contextlib import contextmanager, asynccontextmanager
+from typing import AsyncGenerator
+
+from sqlalchemy import create_engine
+from sqlalchemy import exc as sa_exc
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine
 )
-from contextlib import (
-    asynccontextmanager,
+from sqlalchemy.orm import sessionmaker
+
+from src.conf.settings import settings
+
+DATABASE_URL = settings.postgres
+DATABASE_ASYNC_URL = settings.postgres_async
+
+async_engine = create_async_engine(
+    DATABASE_ASYNC_URL,
+    echo=True,
+    pool_size=5,
+    max_overflow=20,
+    pool_timeout=30,
+    pool_recycle=3600,
 )
-import peewee_async
 
-peewee_async = peewee_async.PostgresqlDatabase()
+async_session_factory = async_sessionmaker(
+    async_engine,
+    autoflush=True,
+    expire_on_commit=False,
+)
 
-
-# Universal database creator.
-# Don't think too much about this class, just be happy it exists.
-class BasePool:
-    _pools = {}
-
-    def __init__(
-        self,
-        database_name,
-        user,
-        host,
-        password,
-        min_size,
-        max_size,
-    ):
-        self.database_name = database_name
-        self.user = user
-        self.host = host
-        self.password = password
-        self.min_size = min_size
-        self.max_size = max_size
-
-    async def initialize_pool(self):
-        pool_key = f"{self.host}_{self.database_name}"
-        if pool_key not in BasePool._pools:
-            BasePool._pools[pool_key] = await asyncpg.create_pool(
-                database=self.database_name,
-                user=self.user,
-                host=self.host,
-                password=self.password,
-                min_size=self.min_size,
-                max_size=self.max_size,
-            )
-        return BasePool._pools[pool_key]
-
-    # Contextmanagers is awesome <3
-    # Releases the connections by itself
-    @asynccontextmanager
-    async def acquire(self):
-        pool_key = f"{self.host}_{self.database_name}"
-        pool = BasePool._pools[pool_key]
-        conn = await pool.acquire()
-        try:
-            yield conn
-        finally:
-            await pool.release(conn)
-
-    # NEVER use this! It will close a connection, and we will run out fairly quick
-    async def close(self):
-        pool_key = f"{self.host}_{self.database_name}"
-        pool = BasePool._pools[pool_key]
-        await pool.close()
+# scoped_session_factory = async_scoped_session(
+#     sessionmaker(
+#         async_engine,
+#         autoflush=True,  # default
+#         autocommit=False,  # default
+#         expire_on_commit=False,
+#         class_=AsyncSession,
+#     ),
+# )
 
 
-# You can freely add more databases by copying PoolUsersData
-class PoolUsersData(BasePool, metaclass=SingletonMeta):
-    def __init__(self):
-        super().__init__(
-            database_name="backend_school",
-            user="firstuser",
-            host="135.181.106.80",
-            password="Studyhard1234.",
-            min_size=1,
-            max_size=20,
-        )
+@asynccontextmanager
+async def get_async_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """Provide a transactional scope for asynchronous database operations."""
+    session: AsyncSession = async_session_factory()
+    try:
+        yield session
+    except sa_exc.DBAPIError:
+        await session.rollback()
+        raise
+    finally:
+        await session.close()
+
+
+
+engine = create_engine(
+    DATABASE_URL,
+    echo=True,
+    pool_size=5,
+    max_overflow=20,
+    pool_timeout=30,
+    pool_recycle=3600,
+)
+
+Session = sessionmaker(engine)
+
+
+@contextmanager
+def get_db_session():
+    """Provide a transactional scope for synchronous database operations."""
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except DBAPIError:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+

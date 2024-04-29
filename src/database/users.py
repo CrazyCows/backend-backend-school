@@ -1,127 +1,76 @@
 import asyncio
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.future import select
+from sqlalchemy.orm import sessionmaker
+from typing import List, Optional
 
-from src.database.conn_pool import (
-    PoolUsersData,
-)
-from src.models.users_model import (
-    User,
-    UserLogin,
-    CreateUser,
-)
-from src.helpers.password_encrypt import (
-    Encryption,
-)
-from typing import List
-from src.database.models import (
-    users,
-    db,
-)
-from datetime import datetime
+from src.dto.users_model import User, UserLogin, CreateUser
+from src.database.models import User as UserModel
+from src.helpers.password_encrypt import Encryption
+from src.database.conn_pool import get_async_db_session
+
+Base = declarative_base()
 
 
-# This is just an example to show how to use the pool and the database connection - database does not exist yet
-# Transactions is used for deletes and inserts to prevent the data from being read when modified.
-class Database:
-    def __init__(self):
-        self.pool = PoolUsersData()
+async def create_user(self, user: CreateUser) -> None:
+    hashed_password, salt = Encryption().hash_password(user.password)
+    async with get_async_db_session() as session:
+        new_user = UserModel(
+            name=user.name, email=user.email, phone=user.phone,
+            role=user.role, username=user.username,
+            password=hashed_password, salt=salt)
+        session.add(new_user)
+        await session.commit()
 
-    async def create_user(self, user: CreateUser) -> None:
-        async with db.atomic_async():
-            hashed_password, salt = Encryption().hash_password(user.password)
-            await users.get_or_create(
-                uid_user=user.uid_user,
-                name=user.name,
-                email=user.email,
-                phone=user.phone,
-                role=user.role,
-                username=user.username,
-                last_login=datetime.now(),
-                registration=datetime.now(),
-                last_modified=datetime.now(),
-                salt=salt,
-                password=hashed_password,
-            )
+async def update_user(self, user: User) -> None:
+    async with get_async_db_session() as session:
+        stmt = select(UserModel).where(UserModel.uid_user == user.uid_user)
+        result = await session.execute(stmt)
+        db_user = result.scalars().first()
+        if db_user:
+            db_user.name = user.name
+            db_user.email = user.email
+            db_user.phone = user.phone
+            db_user.role = user.role
+            await session.commit()
 
-    async def update_user(self, user: User) -> None:
-        async with db.atomic_async():
-            await (
-                users.update(
-                    name=user.name,
-                    email=user.email,
-                    phone=user.phone,
-                    role=user.role,
-                )
-                .where(users.uid_user == user.uid_user)
-                .execute()
-            )
+async def delete_user(self, user: User) -> None:
+    async with get_async_db_session() as session:
+        stmt = select(UserModel).where(UserModel.uid_user == user.uid_user)
+        result = await session.execute(stmt)
+        db_user = result.scalars().first()
+        if db_user:
+            await session.delete(db_user)
+            await session.commit()
 
-    async def delete_user(self, user: User) -> None:
-        async with db.atomic_async():
-            await users.delete().where(users.uid_user == user.uid_user).execute()
+async def fetch_all_users(self) -> List[User]:
+    async with get_async_db_session() as session:
+        stmt = select(UserModel)
+        result = await session.execute(stmt)
+        users = result.scalars().all()
+        return [User(uid_user=str(u.uid_user), name=u.name, email=u.email, phone=u.phone, role=u.role) for u in users]
 
-    async def fetch_all_users(
-        self,
-    ) -> List[User]:
-        async with db.atomic_async():
-            all_users = await users.select()
-            return [user for user in all_users]
-
-    async def fetch_user(
-        self,
-        user: UserLogin,
-        active_user: User = None,
-    ) -> User:
-        async with db.atomic_async():
-            user_query = users.select().where((users.username == user.username) | (users.uid_user == user.uid_user))
-
-            if active_user is None:
-                user = await user_query.get()
-                correct_password = Encryption().verify_password(
-                    user.password,
-                    user.password,
-                )
-                if not correct_password:
-                    raise Exception("Incorrect password")
-                return user
-            else:
-                user_query = user_query.where(users.uid_user == active_user.uid_user)
-                return await user_query.get()
-
-    async def fetch_user_by_id(self, user: User) -> User:
-        async with db.atomic_async():
-            user = await users.get_or_none(users.uid_user == user.uid_user)
-            if not user:
-                raise Exception("User not found")
-            return user
-
+async def fetch_user(self, user: UserLogin, active_user: Optional[User] = None) -> User:
+    async with get_async_db_session() as session:
+        stmt = select(UserModel).where(UserModel.username == user.username)
+        result = await session.execute(stmt)
+        db_user = result.scalars().first()
+        if db_user and Encryption().verify_password(db_user.password, user.password):
+            return User(uid_user=str(db_user.uid_user), name=db_user.name, email=db_user.email,
+                        phone=db_user.phone, role=db_user.role)
+        else:
+            raise Exception("Incorrect username or password")
 
 async def main():
-    base_pool = await PoolUsersData().initialize_pool()
-    database = Database()
 
-    """
-    name: str
-    email: str
-    phone: Optional[str] = None
-    role: str
-    username: str
-    password: str"""
-    create_user = CreateUser(
-        name="test",
-        email="<MAIL>",
-        phone="<PHONE>",
-        role="admin",
-        username="test",
-        password="<PASSWORD>",
-    )
+    # Example user data
+    create_user = CreateUser(name="test", email="example@mail.com", phone="1234567890", role="admin", username="testuser", password="securepassword")
+    user_login = UserLogin(username="testuser", password="securepassword")
 
-    user_login = UserLogin(
-        username="test",
-        password="<PASSWORD>",
-    )
+    # Example database operations
+    await create_user(create_user)
+    print(await fetch_user(user_login))
 
-    print(await database.fetch_user(user_login))
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     asyncio.run(main())

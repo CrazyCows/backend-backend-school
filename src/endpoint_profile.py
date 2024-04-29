@@ -9,12 +9,12 @@ from fastapi.responses import (
 )
 from pydantic import BaseModel
 
-from src.models.users_model import (
+from src.dto.users_model import (
     User,
     UserLogin,
     CreateUser,
 )
-from src.models.calender_model import (
+from src.dto.calender_model import (
     Shift,
 )
 from src.controllers import (

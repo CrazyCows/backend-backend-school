@@ -4,11 +4,11 @@ from src.database import calender, users
 from src.database.conn_pool import (
     PoolUsersData,
 )
-from src.models.calender_model import (
+from src.dto.calender_model import (
     Shift,
     ShiftMember,
 )
-from src.models.users_model import (
+from src.dto.users_model import (
     User,
     UserLogin,
     CreateUser,

@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Optional
 
-from src.models.users_model import User
+from src.dto.users_model import User
 
 
 class ShiftMember(User):
