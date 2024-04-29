@@ -17,15 +17,12 @@ WORKDIR /app
 
 # Copy source code
 COPY src/ src/
-COPY requirements.txt requirements.txt
 #COPY nginx/default.conf/ /etc/nginx/sites-available/
 #COPY nginx/default.conf/ /etc/nginx/sites-enabled/
 
 # Fix missing README.md for poetry package
 RUN if [ ! -f README.md ]; then echo "Placeholder README" > README.md; fi
 
-# Install project dependencies
-RUN pip install -r requirements.txt
 
 # Create a non-root user and switch to it
 RUN useradd --create-home appuser
