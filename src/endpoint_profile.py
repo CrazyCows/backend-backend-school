@@ -1,10 +1,25 @@
-from fastapi import APIRouter, Request, Response, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import (
+    APIRouter,
+    Request,
+    Response,
+    HTTPException,
+)
+from fastapi.responses import (
+    JSONResponse,
+)
 from pydantic import BaseModel
 
-from src.models.users_model import User, UserLogin, CreateUser
-from src.models.calender_model import Shift
-from src.controllers import simple_controller
+from src.models.users_model import (
+    User,
+    UserLogin,
+    CreateUser,
+)
+from src.models.calender_model import (
+    Shift,
+)
+from src.controllers import (
+    simple_controller,
+)
 from datetime import date
 from cryptography.fernet import Fernet
 
@@ -33,7 +48,9 @@ def get_cookie(request: Request):
     raise HTTPException(status_code=403)
 
 
-async def is_user_admin(request: Request):
+async def is_user_admin(
+    request: Request,
+):
     uid_user = get_cookie(request)
     user = User(uid_user=uid_user)
     user = await controls.check_user_active(user)
@@ -48,11 +65,13 @@ async def create_user(user: CreateUser, request: Request):
     try:
         await controls.create_user(user)
         return JSONResponse(
-            content={"message": "successfully created user"}, status_code=201
+            content={"message": "successfully created user"},
+            status_code=201,
         )
     except:
         return JSONResponse(
-            content={"message": "not successful creating user"}, status_code=403
+            content={"message": "not successful creating user"},
+            status_code=403,
         )
 
 
@@ -64,13 +83,19 @@ async def user_login(user: UserLogin, response: Response):
         data = current_user.uid_user
         encrypted_data = encrypt_data(data)
         response = JSONResponse(
-            content={"message": "successfully logged in user"}, status_code=200
+            content={"message": "successfully logged in user"},
+            status_code=200,
         )
-        response.set_cookie(key="secure_cookie", value=encrypted_data, max_age=max_age)
+        response.set_cookie(
+            key="secure_cookie",
+            value=encrypted_data,
+            max_age=max_age,
+        )
         return response
     except:
         return JSONResponse(
-            content={"message": "not successful logging in user"}, status_code=403
+            content={"message": "not successful logging in user"},
+            status_code=403,
         )
 
 
@@ -81,16 +106,20 @@ async def delete_user(user: User, request: Request):
     try:
         await controls.delete_user(user)
         return JSONResponse(
-            content={"message": "successfully deleted user"}, status_code=200
+            content={"message": "successfully deleted user"},
+            status_code=200,
         )
     except:
         return JSONResponse(
-            content={"message": "not successful deleting user"}, status_code=403
+            content={"message": "not successful deleting user"},
+            status_code=403,
         )
 
 
 @router.get("/fetch-all-users/")
-async def fetch_all_users(request: Request):
+async def fetch_all_users(
+    request: Request,
+):
     get_cookie(request)
     try:
         all_users = await controls.fetch_all_users()
@@ -104,7 +133,8 @@ async def fetch_all_users(request: Request):
         )
     except:
         return JSONResponse(
-            content={"message": "not successful deleting user"}, status_code=403
+            content={"message": "not successful deleting user"},
+            status_code=403,
         )
 
 
@@ -114,11 +144,13 @@ async def create_shift(shift: Shift, request: Request):
     try:
         await controls.create_shift(shift)
         return JSONResponse(
-            content={"message": "successfully created shift"}, status_code=200
+            content={"message": "successfully created shift"},
+            status_code=200,
         )
     except:
         return JSONResponse(
-            content={"message": "not successful creating shift"}, status_code=403
+            content={"message": "not successful creating shift"},
+            status_code=403,
         )
 
 
@@ -128,12 +160,16 @@ async def fetch_shift(shift: Shift, request: Request):
     try:
         _shift = await controls.get_shift(shift)
         return JSONResponse(
-            content={"message": "Successfully fetched shift", "shift": _shift.dict()},
+            content={
+                "message": "Successfully fetched shift",
+                "shift": _shift.dict(),
+            },
             status_code=200,
         )
     except:
         return JSONResponse(
-            content={"message": "not successful fetching shift"}, status_code=403
+            content={"message": "not successful fetching shift"},
+            status_code=403,
         )
 
 
@@ -142,7 +178,10 @@ class ShiftRequest(BaseModel):
 
 
 @router.post("/fetch-shifts-for-month/")
-async def fetch_shifts_for_month(chosen_date: ShiftRequest, request: Request):
+async def fetch_shifts_for_month(
+    chosen_date: ShiftRequest,
+    request: Request,
+):
     chosen_date = chosen_date.chosen_date
     uid_user = get_cookie(request)
     user = User(uid_user=uid_user)
@@ -171,11 +210,13 @@ async def delete_shift(shift: Shift, request: Request):
     try:
         await controls.delete_shift(shift)
         return JSONResponse(
-            content={"message": "successfully deleted shift"}, status_code=200
+            content={"message": "successfully deleted shift"},
+            status_code=200,
         )
     except:
         return JSONResponse(
-            content={"message": "not successful deleting shift"}, status_code=403
+            content={"message": "not successful deleting shift"},
+            status_code=403,
         )
 
 

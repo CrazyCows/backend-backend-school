@@ -1,6 +1,16 @@
 import datetime
+from peewee import (
+    PostgresqlDatabase,
+    Model,
+    AutoField,
+    UUIDField,
+    DateTimeField,
+    CharField,
+    BinaryUUIDField,
+    BooleanField,
+    ForeignKeyField,
+)
 
-from peewee import PostgresqlDatabase
 import uuid
 
 # Database connection
@@ -40,8 +50,16 @@ class BaseModel(Model):
 
 class clearence_lvl(BaseModel):
     id = AutoField(primary_key=True)
-    uid_clearance = UUIDField(unique=True, null=False, default=uuid.uuid4)
-    role = CharField(null=False, max_length=100, unique=True)
+    uid_clearance = UUIDField(
+        unique=True,
+        null=False,
+        default=uuid.uuid4,
+    )
+    role = CharField(
+        null=False,
+        max_length=100,
+        unique=True,
+    )
     creation_date = DateTimeField(datetime.datetime.now())
 
 
@@ -52,7 +70,11 @@ class users(BaseModel):
     name = CharField(max_length=255)
     email = CharField(max_length=255, unique=True)
     phone = CharField(max_length=8, unique=True)
-    role = ForeignKeyField(clearence_lvl, to_field="role", on_delete="CASCADE")
+    role = ForeignKeyField(
+        clearence_lvl,
+        to_field="role",
+        on_delete="CASCADE",
+    )
     username = CharField(unique=True, max_length=255)
     last_login = DateTimeField(datetime.datetime.now())
     registration = DateTimeField(datetime.datetime.now())
@@ -72,8 +94,16 @@ class shifts(BaseModel):
 
 class shift_member(BaseModel):
     id = AutoField(primary_key=True)
-    uid_shift = ForeignKeyField(shifts, to_field="uid_shift", on_delete="CASCADE")
-    uid_user = ForeignKeyField(users, to_field="uid_user", on_delete="CASCADE")
+    uid_shift = ForeignKeyField(
+        shifts,
+        to_field="uid_shift",
+        on_delete="CASCADE",
+    )
+    uid_user = ForeignKeyField(
+        users,
+        to_field="uid_user",
+        on_delete="CASCADE",
+    )
     attendance = BooleanField(default=False)
     wished = BooleanField(default=False)
     assigned = BooleanField(default=False)
@@ -81,7 +111,14 @@ class shift_member(BaseModel):
 
 def create_tables():
     with db:
-        db.create_tables([clearence_lvl, users, shifts, shift_member])
+        db.create_tables(
+            [
+                clearence_lvl,
+                users,
+                shifts,
+                shift_member,
+            ]
+        )
 
 
 def create_function():

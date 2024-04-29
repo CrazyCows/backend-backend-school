@@ -1,10 +1,21 @@
 import asyncio
 
 from src.database import calender, users
-from src.database.conn_pool import PoolUsersData
-from src.models.calender_model import Shift, ShiftMember
-from src.models.users_model import User, UserLogin, CreateUser
-from src.helpers.singleton import SingletonMeta
+from src.database.conn_pool import (
+    PoolUsersData,
+)
+from src.models.calender_model import (
+    Shift,
+    ShiftMember,
+)
+from src.models.users_model import (
+    User,
+    UserLogin,
+    CreateUser,
+)
+from src.helpers.singleton import (
+    SingletonMeta,
+)
 from datetime import date
 
 
@@ -26,7 +37,9 @@ class Controller(metaclass=SingletonMeta):
     async def check_user_active(self, user: User) -> User:
         user = await self.userdb.fetch_user_by_id(user)
 
-    async def fetch_all_users(self) -> list[User]:
+    async def fetch_all_users(
+        self,
+    ) -> list[User]:
         return await self.userdb.fetch_all_users()
 
     async def delete_user(self, user: User):
@@ -51,9 +64,18 @@ class Controller(metaclass=SingletonMeta):
         await self.calenderdb.delete_shift(shift)
 
     async def create_shift_member(
-        self, shift: Shift, user: User, wished: bool, assigned: bool
+        self,
+        shift: Shift,
+        user: User,
+        wished: bool,
+        assigned: bool,
     ):
-        await self.calenderdb.create_shift_member(shift, user, wished, assigned)
+        await self.calenderdb.create_shift_member(
+            shift,
+            user,
+            wished,
+            assigned,
+        )
 
     async def update_shift_member(self, shiftmember: ShiftMember):
         await self.calenderdb.update_shift(shiftmember)
@@ -73,7 +95,10 @@ class Controller(metaclass=SingletonMeta):
 async def main():
     await PoolUsersData().initialize_pool()
     controller = Controller()
-    user_login = UserLogin(username="test", password="<PASSWORD>")
+    user_login = UserLogin(
+        username="test",
+        password="<PASSWORD>",
+    )
     print(user_login)
     await controller.login(user_login)
 

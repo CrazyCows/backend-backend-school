@@ -1,10 +1,21 @@
 import asyncio
 
-from src.database.conn_pool import PoolUsersData
-from src.models.users_model import User, UserLogin, CreateUser
-from src.helpers.password_encrypt import Encryption
+from src.database.conn_pool import (
+    PoolUsersData,
+)
+from src.models.users_model import (
+    User,
+    UserLogin,
+    CreateUser,
+)
+from src.helpers.password_encrypt import (
+    Encryption,
+)
 from typing import List
-from src.database.models import users, db
+from src.database.models import (
+    users,
+    db,
+)
 from datetime import datetime
 
 
@@ -35,7 +46,10 @@ class Database:
         async with db.atomic_async():
             await (
                 users.update(
-                    name=user.name, email=user.email, phone=user.phone, role=user.role
+                    name=user.name,
+                    email=user.email,
+                    phone=user.phone,
+                    role=user.role,
                 )
                 .where(users.uid_user == user.uid_user)
                 .execute()
@@ -45,21 +59,26 @@ class Database:
         async with db.atomic_async():
             await users.delete().where(users.uid_user == user.uid_user).execute()
 
-    async def fetch_all_users(self) -> List[User]:
+    async def fetch_all_users(
+        self,
+    ) -> List[User]:
         async with db.atomic_async():
             all_users = await users.select()
             return [user for user in all_users]
 
-    async def fetch_user(self, user: UserLogin, active_user: User = None) -> User:
+    async def fetch_user(
+        self,
+        user: UserLogin,
+        active_user: User = None,
+    ) -> User:
         async with db.atomic_async():
-            user_query = users.select().where(
-                (users.username == user.username) | (users.uid_user == user.uid_user)
-            )
+            user_query = users.select().where((users.username == user.username) | (users.uid_user == user.uid_user))
 
             if active_user is None:
                 user = await user_query.get()
                 correct_password = Encryption().verify_password(
-                    user.password, user.password
+                    user.password,
+                    user.password,
                 )
                 if not correct_password:
                     raise Exception("Incorrect password")
@@ -96,7 +115,10 @@ async def main():
         password="<PASSWORD>",
     )
 
-    user_login = UserLogin(username="test", password="<PASSWORD>")
+    user_login = UserLogin(
+        username="test",
+        password="<PASSWORD>",
+    )
 
     print(await database.fetch_user(user_login))
 

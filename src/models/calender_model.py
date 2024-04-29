@@ -9,9 +9,7 @@ from src.models.users_model import User
 class ShiftMember(User):
     attendance: Optional[str] = None  # Attended the shift or skipped work/got sick
     wished: Optional[bool] = None  # wished for the shift or not, to be prioritised
-    active_member: Optional[bool] = (
-        None  # true if the member has been assigned the shift
-    )
+    active_member: Optional[bool] = None  # true if the member has been assigned the shift
 
 
 class Shift(BaseModel):

@@ -1,6 +1,10 @@
 import asyncpg
-from src.helpers.singleton import SingletonMeta
-from contextlib import asynccontextmanager
+from src.helpers.singleton import (
+    SingletonMeta,
+)
+from contextlib import (
+    asynccontextmanager,
+)
 import peewee_async
 
 peewee_async = peewee_async.PostgresqlDatabase()
@@ -11,7 +15,15 @@ peewee_async = peewee_async.PostgresqlDatabase()
 class BasePool:
     _pools = {}
 
-    def __init__(self, database_name, user, host, password, min_size, max_size):
+    def __init__(
+        self,
+        database_name,
+        user,
+        host,
+        password,
+        min_size,
+        max_size,
+    ):
         self.database_name = database_name
         self.user = user
         self.host = host

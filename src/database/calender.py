@@ -1,9 +1,19 @@
 import asyncio
 
-from src.database.conn_pool import PoolUsersData
-from src.models.calender_model import Shift, Calender, ShiftMember
+from src.database.conn_pool import (
+    PoolUsersData,
+)
+from src.models.calender_model import (
+    Shift,
+    Calender,
+    ShiftMember,
+)
 from datetime import date, datetime
-from src.database.models import db, shifts, shift_member, users, clearence_lvl
+from src.database.models import (
+    db,
+    shifts,
+    shift_member,
+)
 from src.models.users_model import User
 
 
@@ -49,7 +59,10 @@ class Database:
                 SELECT uid_shift, start_time, end_time, active, myShift
                 FROM get_shifts_for_month(?, ?)
             """
-            rows = await db.execute_sql(query, (date, user.uid_user))
+            rows = await db.execute_sql(
+                query,
+                (date, user.uid_user),
+            )
 
             shifts = [
                 Shift(
@@ -63,11 +76,17 @@ class Database:
             ]
 
             return Calender(
-                shifts=shifts, month=date.strftime("%B"), year=str(date.year)
+                shifts=shifts,
+                month=date.strftime("%B"),
+                year=str(date.year),
             )
 
     async def create_shift_member(
-        self, shift: Shift, user: User, wished: bool, assigned: bool
+        self,
+        shift: Shift,
+        user: User,
+        wished: bool,
+        assigned: bool,
     ):
         async with db.atomic_async():
             await shift_member.create(
@@ -83,17 +102,13 @@ class Database:
                 attendance=shiftmember.attendance,
                 wished=shiftmember.wished,
                 assigned=shiftmember.assigned,
-            ).where(
-                (shift_member.uid_shift == shiftmember.uid_shift)
-                & (shift_member.uid_user == shiftmember.uid_user)
-            )
+            ).where((shift_member.uid_shift == shiftmember.uid_shift) & (shift_member.uid_user == shiftmember.uid_user))
             await db.execute(query)
 
     async def fetch_shift_member(self, shiftmember: ShiftMember):
         async with db.atomic_async():
             return await shift_member.get_or_none(
-                (shift_member.uid_shift == shiftmember.uid_shift)
-                & (shift_member.uid_user == shiftmember.uid_user)
+                (shift_member.uid_shift == shiftmember.uid_shift) & (shift_member.uid_user == shiftmember.uid_user)
             )
 
     async def fetch_all_shift_members(self, shift: Shift) -> list[ShiftMember]:
@@ -103,8 +118,7 @@ class Database:
     async def delete_shift_member(self, shiftmember: ShiftMember):
         async with db.atomic_async():
             query = shift_member.delete().where(
-                (shift_member.uid_shift == shiftmember.uid_shift)
-                & (shift_member.uid_user == shiftmember.uid_user)
+                (shift_member.uid_shift == shiftmember.uid_shift) & (shift_member.uid_user == shiftmember.uid_user)
             )
             await db.execute(query)
 
@@ -113,14 +127,23 @@ async def main():
     base_pool = await PoolUsersData().initialize_pool()
     database = Database()
 
-    member1 = ShiftMember(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79", name="test")
-    member2 = ShiftMember(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79", name="test")
+    member1 = ShiftMember(
+        uid_user="c277b223-cd1f-482f-91ee-9622472c1d79",
+        name="test",
+    )
+    member2 = ShiftMember(
+        uid_user="c277b223-cd1f-482f-91ee-9622472c1d79",
+        name="test",
+    )
 
     dummy_shift = Shift(
         uid_shift="3bbfc38e-ed04-45fb-87cc-c049bf8ec96c",
         start_time=datetime(2024, 4, 20, 8, 0),  # April 20, 2024, 8:00 AM
         end_time=datetime(2024, 4, 20, 16, 0),  # April 20, 2024, 4:00 PM
-        wished_shift_members=[member1, member2],
+        wished_shift_members=[
+            member1,
+            member2,
+        ],
         actual_shift_members=[member1],
         active=True,
         description="Morning shift",

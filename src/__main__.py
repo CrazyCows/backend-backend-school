@@ -1,10 +1,18 @@
-from contextlib import asynccontextmanager
+from contextlib import (
+    asynccontextmanager,
+)
 
 import uvicorn
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from src.database.conn_pool import PoolUsersData
-from src.endpoint_profile import router as profile
+from fastapi.middleware.cors import (
+    CORSMiddleware,
+)
+from src.database.conn_pool import (
+    PoolUsersData,
+)
+from src.endpoint_profile import (
+    router as profile,
+)
 
 
 @asynccontextmanager
@@ -15,6 +23,7 @@ async def lifespan(app: FastAPI):
     yield
     # Clean up the ML models and release the resources
     await PoolUsersData().close()
+
 
 # This starts the app and adds the routers to it
 app = FastAPI(lifespan=lifespan)
@@ -32,7 +41,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
+    expose_headers=["*"],
 )
 
 app.include_router(profile, prefix="")
@@ -40,4 +49,3 @@ app.include_router(profile, prefix="")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
