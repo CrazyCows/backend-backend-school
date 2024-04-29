@@ -6,7 +6,7 @@ from sqlalchemy import update
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
 from src.dto.calender_model import Shift, ShiftMember  # Ensure these are SQLAlchemy ORM models
-from src.database.models import Shift as ShiftORM
+from src.database.models import ShiftORM, ShiftMemberORM
 from src.dto.users_model import User
 from src.conf.settings import settings
 from src.database.conn_pool import get_async_db_session
@@ -37,7 +37,7 @@ async def fetch_shift(shift_id: str) -> Shift:
         result = await session.execute(select(ShiftORM).where(ShiftORM.uid_shift == shift_id))
         return result.scalars().first()
 
-async def fetch_month_shifts(date: datetime.date, user_id: str) -> list:
+async def fetch_month_shifts(date: datetime.date) -> list:
     async with get_async_db_session() as session:
         stmt = select(ShiftORM).where(
             func.extract('month', ShiftORM.start_time) == date.month,
@@ -57,8 +57,13 @@ async def fetch_month_shifts(date: datetime.date, user_id: str) -> list:
     user = relationship("UserORM")
 """
 async def create_shift_member(shift_member: ShiftMember):
+    shift_member_orm = ShiftMemberORM(user_id=shift_member.user_id,
+                                      attendance=shift_member.attendance,
+                                      wished=shift_member.wished,
+                                      assigned=shift_member.assigned,
+                                      shift_id=shift_member.shift_id)
     async with get_async_db_session() as session:
-        session.add(shift_member)
+        session.add(shift_member_orm)
         await session.commit()
 
 async def fetch_shift_member(shift_id: str, user_id: str) -> ShiftMember:
@@ -75,7 +80,6 @@ async def delete_shift_member(shift_member: ShiftMember):
         await session.commit()
 
 async def main():
-    
     # Create a dummy user
     user = User(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79", name="John Doe")
 

@@ -39,7 +39,7 @@ class UserORM(Base):
     role = relationship("ClearanceLevelORM")
 
 
-class Shift(Base):
+class ShiftORM(Base):
     __tablename__ = "shifts"
     id = Column(Integer, primary_key=True, autoincrement=True)
     uid_shift = Column(UUID(as_uuid=True), unique=True, default=uuid.uuid4)

@@ -79,12 +79,12 @@ async def fetch_user(user: UserLogin, active_user: Optional[User] = None) -> Use
 async def main():
     # await create_clearence_level("admin")
     # Example user data
-    create_user = CreateUser(name="test", email="example@mail.com", phone="1234567890", role="admin", username="testuser", password="securepassword")
-    user_login = UserLogin(username="testuser", password="securepassword")
+    createuser = CreateUser(name="test", email="example@mail.com", phone="1234567890", role="admin", username="testuser", password="securepassword")
+    #user_login = UserLogin(username="testuser", password="securepassword")
 
     # Example database operations
-    await create_user(create_user)
-    print(await fetch_user(user_login))
+    await create_user(createuser)
+    #print(await fetch_user(user_login))
 
 if __name__ == '__main__':
     asyncio.run(main())
