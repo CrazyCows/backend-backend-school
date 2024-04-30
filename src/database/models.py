@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, text, UUID, func
+from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from src.database.conn_pool import get_db_session, engine
@@ -16,7 +17,7 @@ def create_ossp_extension():
 class ClearanceLevelORM(Base):
     __tablename__ = "clearance_levels"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    uid_user: Column[UUID] = Column(UUID(as_uuid=True), primary_key=True,
+    uid_clearance: Column[UUID] = Column(UUID(as_uuid=True), primary_key=True,
                                      server_default=func.uuid_generate_v4())
     role = Column(String(100), unique=True, nullable=False)
     creation_date = Column(DateTime, default=datetime.now)
@@ -28,13 +29,13 @@ class UserORM(Base):
     uid_user = Column(UUID(as_uuid=True), unique=True, server_default=func.uuid_generate_v4())
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    phone = Column(String(64), unique=True, nullable=False)
+    phone = Column(String(255), unique=True, nullable=False)
     role = Column(String, ForeignKey("clearance_levels.role"), nullable=False)
     username = Column(String(255), unique=True)
     last_login = Column(DateTime, default=datetime.now)
     registration = Column(DateTime, default=datetime.now)
     last_modified = Column(DateTime, default=datetime.now)
-    password = Column(String, nullable=False)
+    password = Column(BYTEA, nullable=False)
     role_relationship = relationship("ClearanceLevelORM")
 
 
@@ -48,7 +49,7 @@ class ShiftORM(Base):
     creation_date = Column(DateTime, default=datetime.now)
 
 class ShiftMemberORM(Base):
-    __tablename__ = "shift_members"
+    __tablename__ = "shift_member"
     id = Column(Integer, primary_key=True, autoincrement=True)
     uid_shift = Column(UUID(as_uuid=True), ForeignKey("shifts.uid_shift"), nullable=False)
     uid_user = Column(UUID(as_uuid=True), ForeignKey("users.uid_user"), nullable=False)
@@ -59,7 +60,7 @@ class ShiftMemberORM(Base):
     user = relationship("UserORM")
 
 
-def create_function():
+def create_sql_function():
     function_sql = text("""
     CREATE OR REPLACE FUNCTION get_shifts_for_month(month_date DATE, uid_user UUID) RETURNS TABLE (
        shift_id INT,
@@ -79,12 +80,57 @@ def create_function():
     $$ LANGUAGE plpgsql;
     """)
 
+
     with get_db_session() as active_session:
         active_session.execute(function_sql)
         active_session.commit()
 
+def create_db():
+    sql_creation_statement = """CREATE TABLE clearance_levels(
+        id SERIAL PRIMARY KEY NOT NULL,
+        uid_clearance UUID UNIQUE DEFAULT uuid_generate_v4(),
+        role VARCHAR(100) UNIQUE NOT NULL,
+        creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    
+    CREATE TABLE users(
+        id SERIAL PRIMARY KEY,
+        uid_user UUID UNIQUE DEFAULT uuid_generate_v4(),
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone CHAR(8),
+        role VARCHAR(100) NOT NULL,
+        username varchar(255) NOT NULL,
+        password varchar(255) NOT NULL,
+        last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        registration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(role) REFERENCES clearence_lvl(role)
+    );
+    
+    
+    CREATE TABLE shifts(
+        id SERIAL PRIMARY KEY,
+        uid_shift uuid UNIQUE DEFAULT uuid_generate_v4(),
+        start_time TIMESTAMP NOT NULL,
+        end_time TIMESTAMP NOT NULL ,
+        active BOOLEAN DEFAULT TRUE,
+        creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    
+    CREATE TABLE shift_member(
+        id SERIAL PRIMARY KEY,
+        uid_shift UUID REFERENCES shifts(uid_shift) ON DELETE CASCADE,
+        uid_user UUID REFERENCES users(uid_user) ON DELETE CASCADE,
+        attendance BOOLEAN DEFAULT TRUE,
+        wished BOOLEAN DEFAULT FALSE,
+        assigned BOOLEAN DEFAULT FALSE
+    );
+    """
 
 if __name__ == "__main__":
     create_ossp_extension()
     Base.metadata.create_all(engine)
-    create_function()
+    #create_db()
+    create_sql_function()
