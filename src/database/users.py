@@ -1,4 +1,6 @@
 import asyncio
+
+import sqlalchemy
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.future import select
@@ -10,7 +12,7 @@ from src.database.models import UserORM as UserModel, ClearanceLevelORM
 from src.helpers.password_encrypt import Encryption
 from src.database.conn_pool import get_async_db_session
 
-Base = declarative_base()
+Base = sqlalchemy.orm.declarative_base()
 
 
 async def create_user(user: CreateUser) -> None:
@@ -79,12 +81,14 @@ async def fetch_user(user: UserLogin, active_user: Optional[User] = None) -> Use
 async def main():
     await create_clearence_level("admin")
     # Example user data
-    createuser = CreateUser(name="test", email="example@mail.com", phone="1234567890", role="admin", username="testuser", password="securepassword")
+    #createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
     #user_login = UserLogin(username="testuser", password="securepassword")
 
     # Example database operations
-    await create_user(createuser)
-    #print(await fetch_user(user_login))
+
+    #await create_user(createuser)
+    user_login = UserLogin(username="testuser2", password="securepassword2")
+    print(await fetch_user(user_login))
 
 if __name__ == '__main__':
     asyncio.run(main())

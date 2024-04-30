@@ -1,4 +1,4 @@
-CREATE TABLE clearence_lvl(
+CREATE TABLE clearance_levels(
     id SERIAL PRIMARY KEY NOT NULL,
     uid_clearance UUID UNIQUE DEFAULT uuid_generate_v4(),
     role VARCHAR(100) UNIQUE NOT NULL,
@@ -34,9 +34,11 @@ CREATE TABLE shifts(
 
 CREATE TABLE shift_member(
     id SERIAL PRIMARY KEY,
-    uid_shift UUID REFERENCES shifts(uid_shift),
-    uid_user UUID REFERENCES users(uid_user),
-    attendance BOOLEAN DEFAULT TRUE
+    uid_shift UUID REFERENCES shifts(uid_shift) ON DELETE CASCADE,
+    uid_user UUID REFERENCES users(uid_user) ON DELETE CASCADE,
+    attendance BOOLEAN DEFAULT TRUE,
+    wished BOOlEAN DEFAULT FALSE,
+    assigned BOOLEAN DEFAULT FALSE
 );
 
 
