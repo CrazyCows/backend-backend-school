@@ -8,6 +8,7 @@ readme = "README.md"
 packages = [{ include = "src", from = "." }]
 
 [tool.poetry.dependencies]
+uvicorn = "^0.27.0"
 python = "^3.11"
 pydantic = "^2.6.4"
 quantlib = "^1.33"
