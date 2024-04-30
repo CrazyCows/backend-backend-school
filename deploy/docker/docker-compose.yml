@@ -15,8 +15,19 @@ services:
       db:
         condition: service_healthy
 
-  frontend:
-    image: node:latest
+  node:
+    image: node:20
+    restart: always
+    user: "node"
+    working_dir: /var/www/frontend/server
+    volumes:
+      - ./frontend:/var/www/frontend
+    ports:
+      - "3000:3000"
+    environment:
+      API_DOMAIN: "https://localhost:8000"
+    command: sh -c "npm install && node ./index.mjs"
+
   nginx:
     image: nginx:latest
     ports:
@@ -26,6 +37,7 @@ services:
       - ./nginx/static:/var/www/static
     depends_on:
       - app
+      - node
 
 
 
