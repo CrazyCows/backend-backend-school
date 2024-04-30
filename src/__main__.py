@@ -7,9 +7,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import (
     CORSMiddleware,
 )
-from src.database.conn_pool import (
-    PoolUsersData,
-)
 from src.endpoint_profile import (
     router as profile,
 )
@@ -17,18 +14,10 @@ import sys
 
 sys.path.insert(0, '/Users/emil/belief_revision_engine/backend-backend-school')
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Load the ML model
-
-    await PoolUsersData().initialize_pool()
-    yield
-    # Clean up the ML models and release the resources
-    await PoolUsersData().close()
 
 
 # This starts the app and adds the routers to it
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 # Allows connections from specific endpoints. Is required to connect from a browser
 origins = [

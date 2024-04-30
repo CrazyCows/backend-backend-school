@@ -28,15 +28,14 @@ class UserORM(Base):
     uid_user = Column(UUID(as_uuid=True), unique=True, server_default=func.uuid_generate_v4())
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    phone = Column(String(8), unique=True, nullable=False)
-    role_id = Column(String, ForeignKey("clearance_levels.role"), nullable=False)
+    phone = Column(String(64), unique=True, nullable=False)
+    role = Column(String, ForeignKey("clearance_levels.role"), nullable=False)
     username = Column(String(255), unique=True)
     last_login = Column(DateTime, default=datetime.now)
     registration = Column(DateTime, default=datetime.now)
     last_modified = Column(DateTime, default=datetime.now)
-    salt = Column(String, nullable=False)
     password = Column(String, nullable=False)
-    role = relationship("ClearanceLevelORM")
+    role_relationship = relationship("ClearanceLevelORM")
 
 
 class ShiftORM(Base):
