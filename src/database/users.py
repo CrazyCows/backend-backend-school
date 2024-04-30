@@ -18,8 +18,8 @@ async def create_user(user: CreateUser) -> None:
     async with get_async_db_session() as session:
         new_user = UserModel(
             name=user.name, email=user.email, phone=user.phone,
-            role_id="", username=user.username,
-            password=hashed_password)
+            role=user.role, username=user.username,
+            password=str(hashed_password))
         session.add(new_user)
         await session.commit()
 
@@ -77,7 +77,7 @@ async def fetch_user(user: UserLogin, active_user: Optional[User] = None) -> Use
             raise Exception("Incorrect username or password")
 
 async def main():
-    # await create_clearence_level("admin")
+    await create_clearence_level("admin")
     # Example user data
     createuser = CreateUser(name="test", email="example@mail.com", phone="1234567890", role="admin", username="testuser", password="securepassword")
     #user_login = UserLogin(username="testuser", password="securepassword")
