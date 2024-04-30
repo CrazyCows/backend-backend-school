@@ -77,19 +77,7 @@ async def create_user(user: CreateUser, request: Request):
 
 
 @router.post("/user-login/")
-async def user_login():
-    create_clearence_level_sync("admin")
-    # Example user data
-    createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
-    #user_login = UserLogin(username="testuser", password="securepassword")
-    # Example database operations
-    create_user_sync(createuser)
-    print("hi")
-    response = JSONResponse(
-        content={"message": "successfully logged in user"},
-        status_code=200,
-    )
-    return response
+async def user_login(user: UserLogin):
     try:
         current_user = await controls.login(user)
         data = current_user.uid_user
