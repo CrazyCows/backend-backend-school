@@ -6,7 +6,7 @@ class Encryption:
         password_bytes = password.encode("utf-8")
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password_bytes, salt)
-        return hashed, salt
+        return hashed
 
     def verify_password(self, stored_hash, password: str):
         password_bytes = password.encode("utf-8")

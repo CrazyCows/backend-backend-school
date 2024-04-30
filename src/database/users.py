@@ -16,12 +16,13 @@ Base = sqlalchemy.orm.declarative_base()
 
 
 async def create_user(user: CreateUser) -> None:
-    hashed_password, salt = Encryption().hash_password(user.password)
+    hashed_password = Encryption().hash_password(user.password)
+    print(hashed_password)
     async with get_async_db_session() as session:
         new_user = UserModel(
             name=user.name, email=user.email, phone=user.phone,
             role=user.role, username=user.username,
-            password=str(hashed_password))
+            password=hashed_password)
         session.add(new_user)
         await session.commit()
 
@@ -67,11 +68,14 @@ async def fetch_all_users() -> List[User]:
         users = result.scalars().all()
         return [User(uid_user=str(u.uid_user), name=u.name, email=u.email, phone=u.phone, role=u.role) for u in users]
 
-async def fetch_user(user: UserLogin, active_user: Optional[User] = None) -> User:
+async def fetch_user(user: UserLogin) -> User:
     async with get_async_db_session() as session:
+        print("--------------- DATABASE ---------------")
         stmt = select(UserModel).where(UserModel.username == user.username)
         result = await session.execute(stmt)
         db_user = result.scalars().first()
+        print(db_user)
+        print()
         if db_user and Encryption().verify_password(db_user.password, user.password):
             return User(uid_user=str(db_user.uid_user), name=db_user.name, email=db_user.email,
                         phone=db_user.phone, role=db_user.role)
@@ -79,7 +83,7 @@ async def fetch_user(user: UserLogin, active_user: Optional[User] = None) -> Use
             raise Exception("Incorrect username or password")
 
 async def main():
-    await create_clearence_level("admin")
+    #await create_clearence_level("admin")
     # Example user data
     #createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
     #user_login = UserLogin(username="testuser", password="securepassword")

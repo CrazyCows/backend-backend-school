@@ -31,8 +31,12 @@ async def update_shift(shift: Shift) -> None:
 
 async def delete_shift(shift: Shift) -> None:
     async with get_async_db_session() as session:
-        await session.delete(shift).where(shift.uid_shift == shift.uid_shift)
-        await session.commit()
+        stmt = select(ShiftORM).where(ShiftORM.uid_shift == shift.uid_shift)
+        result = await session.execute(stmt)
+        db_shift = result.scalars().first()
+        if db_shift:
+            await session.delete(db_shift)
+            await session.commit()
 
 
 async def fetch_shift(shift_id: str) -> Shift:
@@ -94,11 +98,11 @@ async def delete_shift_member(shift_member: ShiftMember):
 
 async def main():
     # Create a dummy user
-    user = User(uid_user="c277b223-cd1f-482f-91ee-9622472c1d79", name="John Doe")
+    user = User(uid_user="c27507bd-41a8-4d7b-b6a1-6b4c62b6935e", name="test2")
 
     # Create a dummy shift
     shift = Shift(
-        uid_shift="3bbfc38e-ed04-45fb-87cc-c049bf8ec96c",
+        uid_shift="6db795a6-2e92-42a8-9991-0a5c4320dba7",
         start_time=datetime(2024, 4, 20, 8, 0),  # April 20, 2024, 8:00 AM
         end_time=datetime(2024, 4, 20, 16, 0),  # April 20, 2024, 4:00 PM
         active=True,
@@ -106,16 +110,19 @@ async def main():
         user_id=user.uid_user  # Assume relationship defined in models
     )
 
+    # Create a dummy shift member
 
-    # shift_member = ShiftMember(uid_user=)
-    
-    await create_shift(shift)
-    values = await fetch_month_shifts(datetime.now())
-    #await create_shift_member()
-    #await fetch_shift_member()
-    #await delete_shift_member(shift)
-    #await delete_shift(shift)
-    print(values)
+    shift_member = ShiftMember(uid_user="c27507bd-41a8-4d7b-b6a1-6b4c62b6935e",
+                               uid_shift="6db795a6-2e92-42a8-9991-0a5c4320dba7")
+
+    #await create_shift(shift)
+    #values = await fetch_month_shifts(datetime.now())
+    #await create_shift_member(shift_member)
+    #shiftmember = await fetch_shift_member(shift_member.uid_shift, shift_member.uid_user)
+    #await delete_shift_member(shift_member)
+    await delete_shift(shift)
+    print("-------------- result --------------")
+    #print(shiftmember.uid_shift)
     """
     # Fetch the shift
     fetched_shift = await fetch_shift(shift.uid_shift)
