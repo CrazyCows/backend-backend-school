@@ -12,6 +12,10 @@ replace-env:  ## Use to update existing .env with .env.example
 .env:  ## Copy .env.example to .env
 	cp .env.example .env
 
+
+install: .env  ## Install dependencies
+	poetry install
+
 setup:
 
 clean:
