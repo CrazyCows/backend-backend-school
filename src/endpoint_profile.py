@@ -48,20 +48,28 @@ logger.add("debug.log", format="{time} {level} {message}", level="DEBUG")
 
 
 def get_cookie(request: Request):
-    logger.debug("Fetching 'secure_cookie' from cookies")
-    encrypted_data = request.cookies.get("secure_cookie")
+    # Log basic request info
+    logger.debug(f"Request received: method={request.method} url={request.url}")
 
+    # Try to log a safe part of the request, avoid logging all cookies or sensitive headers
+    logger.debug(f"Session Cookie: {request.cookies.get('session', 'Not found')}")
+
+    encrypted_data = request.cookies.get("secure_cookie")
     if encrypted_data:
-        logger.debug(f"Encrypted data found: {encrypted_data}")
+        # Log the existence of encrypted data without logging its content
+        logger.debug("Encrypted data found in 'secure_cookie'")
+
         try:
             decrypted_data = decrypt_data(encrypted_data)
-            logger.debug(f"Decrypted data: {decrypted_data}")
+            # Log successful decryption without exposing the decrypted data
+            logger.debug("Data decrypted successfully")
             return decrypted_data  # Should be userId (for the love of god)
         except Exception as e:
+            # Log the error with decryption
             logger.error(f"Failed to decrypt data: {e}")
             raise HTTPException(status_code=403, detail="Failed to decrypt data")
 
-    logger.warning("No encrypted data found in cookies")
+    logger.warning("No encrypted data found in 'secure_cookie'")
     raise HTTPException(status_code=403, detail="No secure cookie found")
 
 
