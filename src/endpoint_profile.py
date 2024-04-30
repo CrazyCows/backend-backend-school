@@ -9,6 +9,7 @@ from fastapi.responses import (
 )
 from pydantic import BaseModel
 
+
 from src.database.users import create_clearence_level_sync, create_user_sync
 from src.dto.users_model import (
     User,
@@ -23,6 +24,7 @@ from src.controllers import (
 )
 from datetime import date
 from cryptography.fernet import Fernet
+from loguru import logger
 
 # Just an example of how to setup routing for CRUD
 
@@ -41,12 +43,26 @@ def decrypt_data(data: str) -> str:
     return cipher.decrypt(data.encode()).decode()
 
 
+# Configure the logger
+logger.add("debug.log", format="{time} {level} {message}", level="DEBUG")
+
+
 def get_cookie(request: Request):
+    logger.debug("Fetching 'secure_cookie' from cookies")
     encrypted_data = request.cookies.get("secure_cookie")
+
     if encrypted_data:
-        decrypted_data = decrypt_data(encrypted_data)
-        return decrypted_data  # Should be userId (for the love of god)
-    raise HTTPException(status_code=403)
+        logger.debug(f"Encrypted data found: {encrypted_data}")
+        try:
+            decrypted_data = decrypt_data(encrypted_data)
+            logger.debug(f"Decrypted data: {decrypted_data}")
+            return decrypted_data  # Should be userId (for the love of god)
+        except Exception as e:
+            logger.error(f"Failed to decrypt data: {e}")
+            raise HTTPException(status_code=403, detail="Failed to decrypt data")
+
+    logger.warning("No encrypted data found in cookies")
+    raise HTTPException(status_code=403, detail="No secure cookie found")
 
 
 async def is_user_admin(
@@ -83,7 +99,7 @@ async def user_login(user: UserLogin):
         data = current_user.uid_user
         encrypted_data = encrypt_data(data)
         response = JSONResponse(
-            content={"message": "successfully logged in user"},
+            content={"data": current_user},
             status_code=200,
         )
         response.set_cookie(
