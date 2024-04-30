@@ -12,21 +12,23 @@ ENV POETRY_HTTP_TIMEOUT=300
 #RUN pip install poetry==1.2.2 \
 #    && poetry config virtualenvs.create false
 
+# Install Poetry
+RUN pip install poetry==1.2.2 \
+    && poetry config virtualenvs.create false
+
 # Set work directory
 WORKDIR /app
 
 # Copy source code
 COPY src/ src/
-COPY requirements.txt requirements.txt
+COPY pyproject.toml /app/
 #COPY nginx/default.conf/ /etc/nginx/sites-available/
 #COPY nginx/default.conf/ /etc/nginx/sites-enabled/
 
 # Fix missing README.md for poetry package
 RUN if [ ! -f README.md ]; then echo "Placeholder README" > README.md; fi
 
-run pip install uvicorn
-# Install project dependencies
-RUN pip install -r requirements.txt
+RUN poetry install
 
 # Create a non-root user and switch to it
 RUN useradd --create-home appuser
