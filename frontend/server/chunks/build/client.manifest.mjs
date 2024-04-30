@@ -6,23 +6,23 @@ const client_manifest = {
     "file": "VTextField.8etwgo9T.css",
     "src": "_!~{00c}~.js"
   },
-  "_DE004rFY.js": {
+  "_CfvCdQUg.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "DE004rFY.js",
+    "file": "CfvCdQUg.js",
     "name": "vue.f36acd1f",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
     ]
   },
-  "_DWdaK6Si.js": {
+  "_D1b4Krt0.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "DWdaK6Si.js",
+    "file": "D1b4Krt0.js",
     "name": "VTextField",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
@@ -66,13 +66,13 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "BTF2oL3X.js",
+    "file": "seOqnv-U.js",
     "name": "error-404",
     "src": "node_modules/@nuxt/ui-templates/dist/templates/error-404.vue",
     "isDynamicEntry": true,
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_DE004rFY.js"
+      "_CfvCdQUg.js"
     ],
     "css": [
       "error-404.JekaaCis.css"
@@ -89,12 +89,12 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "DsaTHrGU.js",
+    "file": "DLYbvTNh.js",
     "name": "error-500",
     "src": "node_modules/@nuxt/ui-templates/dist/templates/error-500.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_DE004rFY.js",
+      "_CfvCdQUg.js",
       "node_modules/nuxt/dist/app/entry.js"
     ],
     "css": [
@@ -112,7 +112,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "C17y3m3A.js",
+    "file": "CD7iJcX-.js",
     "name": "entry",
     "src": "node_modules/nuxt/dist/app/entry.js",
     "isEntry": true,
@@ -168,7 +168,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "MUMhqgsK.js",
+    "file": "CF-zx8ni.js",
     "name": "panel",
     "src": "pages/admin/panel.vue",
     "isDynamicEntry": true,
@@ -181,7 +181,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "CXvwJf9H.js",
+    "file": "BPAiy0OL.js",
     "name": "calendar",
     "src": "pages/calendar.vue",
     "isDynamicEntry": true,
@@ -203,7 +203,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "BKI5z6qF.js",
+    "file": "Dn_CT9Jl.js",
     "name": "dashboard",
     "src": "pages/dashboard.vue",
     "isDynamicEntry": true,
@@ -225,7 +225,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "DiIy6-jK.js",
+    "file": "CBv8D4_2.js",
     "name": "mor",
     "src": "pages/din/mor.vue",
     "isDynamicEntry": true,
@@ -238,23 +238,23 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "CPNEZziO.js",
+    "file": "CMUWlTTl.js",
     "name": "index",
     "src": "pages/index.vue",
     "isDynamicEntry": true,
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_DWdaK6Si.js"
+      "_D1b4Krt0.js"
     ],
     "css": [
-      "index.DHHMTHuk.css"
+      "index.x2_ROean.css"
     ],
     "assets": [
       "background.4KK4T8pt.webp"
     ]
   },
-  "index.DHHMTHuk.css": {
-    "file": "index.DHHMTHuk.css",
+  "index.x2_ROean.css": {
+    "file": "index.x2_ROean.css",
     "resourceType": "style",
     "prefetch": true,
     "preload": true
@@ -264,7 +264,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "D1R6rAiR.js",
+    "file": "DUC3_b2U.js",
     "name": "library",
     "src": "pages/library.vue",
     "isDynamicEntry": true,
@@ -277,13 +277,13 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "2XnhW1Jb.js",
+    "file": "BmP0UwUv.js",
     "name": "login",
     "src": "pages/login.vue",
     "isDynamicEntry": true,
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_DWdaK6Si.js"
+      "_D1b4Krt0.js"
     ]
   },
   "public/background.webp": {

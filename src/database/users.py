@@ -10,7 +10,7 @@ from typing import List, Optional
 from src.dto.users_model import User, UserLogin, CreateUser
 from src.database.models import UserORM as UserModel, ClearanceLevelORM
 from src.helpers.password_encrypt import Encryption
-from src.database.conn_pool import get_async_db_session
+from src.database.conn_pool import get_async_db_session, get_db_session
 
 Base = sqlalchemy.orm.declarative_base()
 
@@ -26,6 +26,17 @@ async def create_user(user: CreateUser) -> None:
         session.add(new_user)
         await session.commit()
 
+def create_user_sync(user: CreateUser) -> None:
+    hashed_password = Encryption().hash_password(user.password)
+    print(hashed_password)
+    with get_db_session() as session:
+        new_user = UserModel(
+            name=user.name, email=user.email, phone=user.phone,
+            role=user.role, username=user.username,
+            password=hashed_password)
+        session.add(new_user)
+        session.commit()
+
 """
     id SERIAL PRIMARY KEY NOT NULL,
     uid_clearance UUID UNIQUE DEFAULT uuid_generate_v4(),
@@ -39,6 +50,11 @@ async def create_clearence_level(clearence_role: str) -> None:
         session.add(clearence_level)
         await session.commit()
 
+def create_clearence_level_sync(clearence_role: str) -> None:
+    clearence_level = ClearanceLevelORM(role=clearence_role)
+    with get_db_session() as session:
+        session.add(clearence_level)
+        session.commit()
 
 async def update_user(user: User) -> None:
     async with get_async_db_session() as session:
@@ -83,9 +99,9 @@ async def fetch_user(user: UserLogin) -> User:
             raise Exception("Incorrect username or password")
 
 async def main():
-    #await create_clearence_level("admin")
+    await create_clearence_level("admin")
     # Example user data
-    #createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
+    createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
     #user_login = UserLogin(username="testuser", password="securepassword")
 
     # Example database operations
