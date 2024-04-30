@@ -1,9 +1,6 @@
 import asyncio
 
 from src.database import calender, users
-from src.database.conn_pool import (
-    PoolUsersData,
-)
 from src.dto.calender_model import (
     Shift,
     ShiftMember,
@@ -21,8 +18,8 @@ from datetime import date
 
 class Controller(metaclass=SingletonMeta):
     def __init__(self):
-        self.userdb = users.Database()
-        self.calenderdb = calender.Database()
+        self.userdb = users
+        self.calenderdb = calender
 
     async def create_user(self, user: CreateUser):
         await self.userdb.create_user(user)
@@ -93,14 +90,7 @@ class Controller(metaclass=SingletonMeta):
 
 
 async def main():
-    await PoolUsersData().initialize_pool()
-    controller = Controller()
-    user_login = UserLogin(
-        username="test",
-        password="<PASSWORD>",
-    )
-    print(user_login)
-    await controller.login(user_login)
+    print(":)")
 
 
 if __name__ == "__main__":
