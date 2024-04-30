@@ -7,7 +7,7 @@ from pydantic_settings import (
 
 class PostgresSettings(BaseSettings):
     host: str = Field(
-        default="127.0.0.1",
+        default="backend_postgres",
         description="Postgres host",
     )
     port: int = Field(

@@ -86,51 +86,10 @@ def create_sql_function():
         active_session.commit()
 
 def create_db():
-    sql_creation_statement = """CREATE TABLE clearance_levels(
-        id SERIAL PRIMARY KEY NOT NULL,
-        uid_clearance UUID UNIQUE DEFAULT uuid_generate_v4(),
-        role VARCHAR(100) UNIQUE NOT NULL,
-        creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    
-    CREATE TABLE users(
-        id SERIAL PRIMARY KEY,
-        uid_user UUID UNIQUE DEFAULT uuid_generate_v4(),
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) NOT NULL,
-        phone CHAR(8),
-        role VARCHAR(100) NOT NULL,
-        username varchar(255) NOT NULL,
-        password varchar(255) NOT NULL,
-        last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        registration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(role) REFERENCES clearence_lvl(role)
-    );
-    
-    
-    CREATE TABLE shifts(
-        id SERIAL PRIMARY KEY,
-        uid_shift uuid UNIQUE DEFAULT uuid_generate_v4(),
-        start_time TIMESTAMP NOT NULL,
-        end_time TIMESTAMP NOT NULL ,
-        active BOOLEAN DEFAULT TRUE,
-        creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    
-    CREATE TABLE shift_member(
-        id SERIAL PRIMARY KEY,
-        uid_shift UUID REFERENCES shifts(uid_shift) ON DELETE CASCADE,
-        uid_user UUID REFERENCES users(uid_user) ON DELETE CASCADE,
-        attendance BOOLEAN DEFAULT TRUE,
-        wished BOOLEAN DEFAULT FALSE,
-        assigned BOOLEAN DEFAULT FALSE
-    );
-    """
-
-if __name__ == "__main__":
     create_ossp_extension()
     Base.metadata.create_all(engine)
-    #create_db()
     create_sql_function()
+
+
+if __name__ == "__main__":
+    create_db()

@@ -99,16 +99,23 @@ async def fetch_user(user: UserLogin) -> User:
             raise Exception("Incorrect username or password")
 
 async def main():
-    await create_clearence_level("admin")
+    # await create_clearence_level("admin")
     # Example user data
-    createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
+    #createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
     #user_login = UserLogin(username="testuser", password="securepassword")
 
     # Example database operations
 
     #await create_user(createuser)
-    user_login = UserLogin(username="testuser2", password="securepassword2")
-    print(await fetch_user(user_login))
+    #user_login = UserLogin(username="testuser2", password="securepassword2")
+
+    create_clearence_level_sync("admin")
+    # Example user data
+    createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
+    #user_login = UserLogin(username="testuser", password="securepassword")
+    # Example database operations
+    create_user_sync(createuser)
+    #print(await fetch_user(user_login))
 
 if __name__ == '__main__':
     asyncio.run(main())
