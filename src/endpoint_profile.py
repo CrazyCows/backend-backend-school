@@ -23,7 +23,7 @@ from src.controllers import (
 )
 from datetime import date
 from cryptography.fernet import Fernet
-
+from loguru import logger
 # Just an example of how to setup routing for CRUD
 
 router = APIRouter()
@@ -186,13 +186,14 @@ async def fetch_shifts_for_month(
     chosen_date: ShiftRequest,
     request: Request,
 ):
+
+    logger.info(f"fetch shifts for: {request.cookies}")
     chosen_date = chosen_date.chosen_date
     uid_user = get_cookie(request)
     user = User(uid_user=uid_user)
-
     try:
         print("hi")
-        month_calender = await controls.get_shifts_for_month(chosen_date, user)
+        month_calender = await controls.get_shifts_for_month(chosen_date)
         print("hi")
         return JSONResponse(
             content={
@@ -204,7 +205,7 @@ async def fetch_shifts_for_month(
     except:
         return JSONResponse(
             content={"message": "not successful fetching all shifts for month"},
-            status_code=403,
+            status_code=400,
         )
 
 

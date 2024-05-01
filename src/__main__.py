@@ -53,7 +53,7 @@ if __name__ == "__main__":
     create_db()
     # Example user data
     create_clearence_level_sync("admin")
-    createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
+    createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="t", password="t")
     # Example database operations
     create_user_sync(createuser)
     uvicorn.run(app, host="0.0.0.0", port=8000)
