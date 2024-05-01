@@ -39,7 +39,8 @@ async def delete_shift(shift: Shift) -> None:
             await session.commit()
 
 
-async def fetch_shift(shift_id: str) -> Shift:
+async def fetch_shift(shift: Shift) -> Shift:
+    shift_id = shift.uid_shift
     async with get_async_db_session() as session:
         result = await session.execute(select(ShiftORM).where(ShiftORM.uid_shift == shift_id))
         return result.scalars().first()
@@ -79,7 +80,9 @@ async def create_shift_member(shift_member: ShiftMember):
         await session.commit()
 
 
-async def fetch_shift_member(shift_id: str, user_id: str) -> ShiftMember:
+async def fetch_shift_member(shift_member: ShiftMember) -> ShiftMember:
+    shift_id = shift_member.uid_shift
+    user_id = shift_member.uid_user
     async with get_async_db_session() as session:
         stmt = select(ShiftMemberORM).where(ShiftMemberORM.uid_shift == shift_id, ShiftMemberORM.uid_user == user_id)
         result = await session.execute(stmt)

@@ -98,6 +98,15 @@ async def fetch_user(user: UserLogin) -> User:
         else:
             raise Exception("Incorrect username or password")
 
+async def fetch_user_by_id(user: User) -> User:
+
+    async with get_async_db_session() as session:
+        print("--------------- DATABASE ---------------")
+        stmt = select(UserModel).where(UserModel.uid_user == user.uid_user)
+        result = await session.execute(stmt)
+        db_user = result.scalars().first()
+        return db_user
+
 async def main():
     # await create_clearence_level("admin")
     # Example user data

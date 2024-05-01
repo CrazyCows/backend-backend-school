@@ -33,6 +33,7 @@ class Controller(metaclass=SingletonMeta):
 
     async def check_user_active(self, user: User) -> User:
         user = await self.userdb.fetch_user_by_id(user)
+        return user
 
     async def fetch_all_users(
         self,
@@ -52,8 +53,8 @@ class Controller(metaclass=SingletonMeta):
         shift = await self.calenderdb.fetch_shift(shift)
         return shift
 
-    async def get_shifts_for_month(self, _date: date, user: User):
-        _calender = await self.calenderdb.fetch_month_shifts(_date, user)
+    async def get_shifts_for_month(self, _date: date):
+        _calender = await self.calenderdb.fetch_month_shifts(_date)
 
         return _calender
 
