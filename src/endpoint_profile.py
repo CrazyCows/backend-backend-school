@@ -220,7 +220,7 @@ async def fetch_shifts_for_month(
     uid_user = get_cookie(request)
     try:
         month_calender = await controls.get_shifts_for_month(shift_request)
-        calender = Calender(shifts=month_calender, year=chosen_date.year, month=chosen_date.month)
+        calender = Calender(shifts=month_calender, year=str(chosen_date.year), month=str(chosen_date.month))
         return JSONResponse(
             content={
                 "message": "successfully fetched all shifts for month",
