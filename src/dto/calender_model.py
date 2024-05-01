@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from pydantic import BaseModel
 from typing import List, Optional
@@ -24,9 +24,9 @@ class Shift(BaseModel):
 
 
 class Calender(BaseModel):
-    shifts: List[Shift]
-    month: str
-    year: str
+    shifts: list
+    month: int
+    year: int
 
     def to_dict(self):
         return {
@@ -47,3 +47,6 @@ class Calender(BaseModel):
 class Clearnce_lvl(BaseModel):
     id_actual: str
     role: str
+
+class ShiftRequest(BaseModel):
+    chosen_date: date  # Ensure the type and field name are correct

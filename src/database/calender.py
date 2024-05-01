@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import update
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
-from src.dto.calender_model import Shift, ShiftMember  # Ensure these are SQLAlchemy ORM models
+from src.dto.calender_model import Shift, ShiftMember, ShiftRequest  # Ensure these are SQLAlchemy ORM models
 from src.database.models import ShiftORM, ShiftMemberORM
 from src.dto.users_model import User
 from src.conf.settings import settings
@@ -21,12 +21,15 @@ async def create_shift(shift: Shift) -> None:
 
 async def update_shift(shift: Shift) -> None:
     async with get_async_db_session() as session:
-        await session.execute(
-            update(ShiftORM)
-            .where(ShiftORM.uid_shift == shift.uid_shift)
-            .values(start_time=shift.start_time, end_time=shift.end_time, active=shift.active)
-        )
-        await session.commit()
+        stmt = select(ShiftORM).where(ShiftORM.uid_shift == shift.uid_shift)
+        result = await session.execute(stmt)
+        db_shift = result.scalar().first()
+        if db_shift:
+            db_shift.start_time = shift.start_time
+            db_shift.end_time = shift.end_time
+            db_shift.uid_shift = shift.uid_shift
+            db_shift.active = shift.active
+            await session.commit()
 
 
 async def delete_shift(shift: Shift) -> None:
@@ -46,11 +49,20 @@ async def fetch_shift(shift: Shift) -> Shift:
         return result.scalars().first()
 
 
-async def fetch_month_shifts(date: datetime.date) -> list[Shift]:
+async def fetch_month_shifts(shift_request: ShiftRequest) -> list[Shift]:
+    print("hi")
+    print(shift_request)
+    _date = shift_request.chosen_date
+    print("hi")
+    month = _date.month
+    print("hi")
+    year = _date.year
+    print(month, year)
+    print("hi")
     async with get_async_db_session() as session:
         stmt = select(ShiftORM).where(
-            func.extract('month', ShiftORM.start_time) == date.month,
-            func.extract('year', ShiftORM.start_time) == date.year
+            func.extract('month', ShiftORM.start_time) == month,
+            func.extract('year', ShiftORM.start_time) == year
         )
         result = await session.execute(stmt)
         shifts = result.scalars().all()
@@ -87,7 +99,37 @@ async def fetch_shift_member(shift_member: ShiftMember) -> ShiftMember:
     async with get_async_db_session() as session:
         stmt = select(ShiftMemberORM).where(ShiftMemberORM.uid_shift == shift_id, ShiftMemberORM.uid_user == user_id)
         result = await session.execute(stmt)
-        return result.scalars().first()
+        db_shift_member = result.scalars().first()
+        if db_shift_member:
+            return ShiftMember(uid_shift=db_shift_member.uid_shift,
+                               uid_user=db_shift_member.uid_user,
+                               attendance=db_shift_member.attendance,
+                               wished=db_shift_member.wished,
+                               assigned=db_shift_member.assigned)
+        else:
+            raise Exception("No such shift member")
+
+
+
+async def fetch_all_shift_members(shift: Shift) -> list[ShiftMember]:
+    async with get_async_db_session() as session:
+        stmt = select(ShiftMemberORM).where(ShiftMemberORM.uid_shift == shift.uid_shift)
+        result = await session.execute(stmt)
+        result_list = result.scalars().all()
+        return_list = []
+        for shift_member in result_list:
+            return_list.append(ShiftMember(
+                uid_shift=shift_member.uid_shift,
+                uid_user=shift_member.uid_user,
+                name = shift_member.name,
+                email = shift_member.email,
+                phone = shift_member.phone,
+                role = shift_member.role,
+                attendance = shift_member.attendance,
+                wished = shift_member.wished,
+                assigned = shift_member.assigned,
+            ))
+        return return_list
 
 
 async def delete_shift_member(shift_member: ShiftMember):
@@ -97,6 +139,19 @@ async def delete_shift_member(shift_member: ShiftMember):
         db_shift_member = result.scalars().first()
         if db_shift_member:
             await session.delete(db_shift_member)
+            await session.commit()
+
+async def update_shift_member(shift_member: ShiftMember):
+    async with get_async_db_session() as session:
+        stmt = select(ShiftMemberORM).where(ShiftMemberORM.uid_shift == shift_member.uid_shift and ShiftMemberORM.uid_user == shift_member.uid_user)
+        result = await session.execute(stmt)
+        db_shift_member = result.scalars().first()
+        if db_shift_member:
+            db_shift_member.uid_shift = shift_member.uid_shift
+            db_shift_member.uid_user = shift_member.uid_user
+            db_shift_member.attendance = shift_member.attendance
+            db_shift_member.wished = shift_member.wished
+            db_shift_member.assigned = shift_member.assigned
             await session.commit()
 
 

@@ -3,7 +3,7 @@ import asyncio
 from src.database import calender, users
 from src.dto.calender_model import (
     Shift,
-    ShiftMember,
+    ShiftMember, ShiftRequest,
 )
 from src.dto.users_model import (
     User,
@@ -28,7 +28,7 @@ class Controller(metaclass=SingletonMeta):
         await self.userdb.update_user(user)
 
     async def login(self, user_login: UserLogin) -> User:
-        user = await self.userdb.fetch_user(user_login)
+        user = await self.userdb.fetch_user_by_login(user_login)
         return user
 
     async def check_user_active(self, user: User) -> User:
@@ -53,33 +53,26 @@ class Controller(metaclass=SingletonMeta):
         shift = await self.calenderdb.fetch_shift(shift)
         return shift
 
-    async def get_shifts_for_month(self, _date: date):
-        _calender = await self.calenderdb.fetch_month_shifts(_date)
-
+    async def get_shifts_for_month(self, shift_request: ShiftRequest) -> list[Shift]:
+        print("hi")
+        _calender = await self.calenderdb.fetch_month_shifts(shift_request)
         return _calender
 
     async def delete_shift(self, shift: Shift):
         await self.calenderdb.delete_shift(shift)
 
     async def create_shift_member(
-        self,
-        shift: Shift,
-        user: User,
-        wished: bool,
-        assigned: bool,
+        self, shift_member: ShiftMember
     ):
         await self.calenderdb.create_shift_member(
-            shift,
-            user,
-            wished,
-            assigned,
+            shift_member
         )
 
-    async def update_shift_member(self, shiftmember: ShiftMember):
-        await self.calenderdb.update_shift(shiftmember)
+    async def update_shift_member(self, shift_member: ShiftMember):
+        await self.calenderdb.update_shift_member(shift_member)
 
-    async def fetch_shift_member(self, shiftmember: ShiftMember):
-        shift_member = await self.calenderdb.fetch_shift_member(shiftmember)
+    async def fetch_shift_member(self, shift_member: ShiftMember):
+        shift_member = await self.calenderdb.fetch_shift_member(shift_member)
         return shift_member
 
     async def fetch_all_shift_members(self, shift: Shift) -> list[ShiftMember]:

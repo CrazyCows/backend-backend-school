@@ -84,7 +84,7 @@ async def fetch_all_users() -> List[User]:
         users = result.scalars().all()
         return [User(uid_user=str(u.uid_user), name=u.name, email=u.email, phone=u.phone, role=u.role) for u in users]
 
-async def fetch_user(user: UserLogin) -> User:
+async def fetch_user_by_login(user: UserLogin) -> User:
     async with get_async_db_session() as session:
         print("--------------- DATABASE ---------------")
         stmt = select(UserModel).where(UserModel.username == user.username)
@@ -99,14 +99,16 @@ async def fetch_user(user: UserLogin) -> User:
             raise Exception("Incorrect username or password")
 
 async def fetch_user_by_id(user: User) -> User:
-
     async with get_async_db_session() as session:
         print("--------------- DATABASE ---------------")
         stmt = select(UserModel).where(UserModel.uid_user == user.uid_user)
         result = await session.execute(stmt)
         db_user = result.scalars().first()
-        return db_user
-
+        if db_user:
+            return User(uid_user=str(db_user.uid_user), name=db_user.name,
+                        email=db_user.email, phone=db_user.phone, role=db_user.role)
+        else:
+            raise Exception("User doesn't exist or an error has occured")
 async def main():
     # await create_clearence_level("admin")
     # Example user data
