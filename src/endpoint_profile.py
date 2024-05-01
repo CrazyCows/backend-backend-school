@@ -82,14 +82,18 @@ async def user_login(user: UserLogin):
         current_user = await controls.login(user)
         data = current_user.uid_user
         encrypted_data = encrypt_data(data)
+
         response = JSONResponse(
-            content={"message": "successfully logged in user"},
+            content={"message": "successfully logged in user", "data": current_user.dict()},
             status_code=200,
         )
         response.set_cookie(
             key="secure_cookie",
             value=encrypted_data,
             max_age=max_age,
+            httponly=True,
+            samesite="none",
+            secure=True
         )
         return response
     except:

@@ -1,0 +1,1 @@
+import{_ as n,v as t,t as o,M as s,x as e}from"./DWLzgMwE.js";const r={},c=e("br",null,null,-1),l=e("br",null,null,-1),_=e("h1",null,"din mor",-1);function a(u,d){return o(),t(s,null,[c,l,_],64)}const m=n(r,[["render",a]]);export{m as default};

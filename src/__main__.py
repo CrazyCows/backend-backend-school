@@ -28,7 +28,10 @@ app = FastAPI()
 # Allows connections from specific endpoints. Is required to connect from a browser
 origins = [
     "http://localhost:63342",
-    "http://localhost"# Assuming you're using http and not https
+    "http://localhost",
+    "http://127.0.0.1",
+    "https://localhost",
+    "https://127.0.0.1"
 ]
 
 # Cors middleware - it allows for setting cookies in browser
@@ -51,7 +54,6 @@ if __name__ == "__main__":
     # Example user data
     create_clearence_level_sync("admin")
     createuser = CreateUser(name="test2", email="example@gmail.com", phone="12345679", role="admin", username="testuser2", password="securepassword2")
-    #user_login = UserLogin(username="testuser", password="securepassword")
     # Example database operations
     create_user_sync(createuser)
     uvicorn.run(app, host="0.0.0.0", port=8000)
