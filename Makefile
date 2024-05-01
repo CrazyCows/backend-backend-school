@@ -29,7 +29,7 @@ kill:  ## Kill all running containers
 
 
 run: build   ## Run the project
-	docker-compose -f deploy/docker/docker-compose.yml -f deploy/docker/docker-compose.local.yml --project-directory . up
+	docker-compose -f deploy/docker/docker-compose.yml --project-directory . up
 
 reboot: kill run  ## Kill all running containers and run the project
 
