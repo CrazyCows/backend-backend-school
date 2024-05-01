@@ -1,5 +1,10 @@
 version: "3.9"
 
+networks:
+  backend_school_net:
+    driver: bridge
+
+
 services:
   app:
     build:
@@ -16,50 +21,40 @@ services:
     depends_on:
       db:
         condition: service_healthy
-
+    networks:
+      - backend_school_net
   node:
     image: node:20
     restart: always
-    user: "node"
     working_dir: /var/www/frontend/server
     volumes:
       - ./frontend:/var/www/frontend
     ports:
       - "3000:3000"
     command: sh -c "npm install && node ./index.mjs"
-
+    networks:
+      - backend_school_net
   nginx:
-    image: nginx:latest
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
+    environment:
+      - CERTBOT_EMAIL
+    env_file:
+      - ./nginx/nginx-certbot.env
+    links:
+      - app
+      - node
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/static:/var/www/static
-      - ./nginx/cert:/etc/nginx/cert
+      - ./nginx/nginx_secrets:/etc/letsencrypt
+      - ./nginx/conf.d:/etc/nginx/user_conf.d
     depends_on:
       - app
       - node
-
-  #nginx:
-  #  image: jonasal/nginx-certbot:latest
-  #  restart: unless-stopped
-  #  environment:
-  #    - CERTBOT_EMAIL
-  #  env_file:
-  #    - ./nginx/nginx-certbot.env
-  #  ports:
-  #    - "80:80"
-  #    - "443:443"
-  #  volumes:
-  #    - ./nginx/nginx_secrets:/etc/letsencrypt
-  #    - ./nginx/conf.d:/etc/nginx/conf.d
-  #  links:
-  #    - WF
-  #  depends_on:
-  #    - app
-  #    - node
-
+    networks:
+      - backend_school_net
   db:
     image: postgres:13.4-buster
     hostname: backend_school
@@ -82,7 +77,8 @@ services:
       interval: 2s
       timeout: 3s
       retries: 40
-
+    networks:
+      - backend_school_net
 volumes:
   calender-backend:
     name: calender-backend

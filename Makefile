@@ -29,10 +29,6 @@ kill:  ## Kill all running containers
 
 
 run: build   ## Run the project
-	@echo "Stopping and removing current containers and volumes..."
-	docker-compose -f deploy/docker/docker-compose.yml --project-directory . down -v
-	@echo "Building and starting new containers..."
-	docker-compose -f deploy/docker/docker-compose.yml --project-directory . up -d
 	docker-compose -f deploy/docker/docker-compose.yml -f deploy/docker/docker-compose.local.yml --project-directory . up
 
 reboot: kill run  ## Kill all running containers and run the project

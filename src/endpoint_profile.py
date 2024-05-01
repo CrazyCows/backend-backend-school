@@ -186,8 +186,6 @@ async def fetch_shifts_for_month(
     chosen_date: ShiftRequest,
     request: Request,
 ):
-
-    logger.info(f"fetch shifts for: {request.cookies}")
     chosen_date = chosen_date.chosen_date
     uid_user = get_cookie(request)
     try:
