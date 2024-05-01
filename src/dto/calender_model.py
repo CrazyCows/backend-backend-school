@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from pydantic import BaseModel
 from typing import List, Optional
@@ -33,3 +33,6 @@ class Calender(BaseModel):
 class Clearnce_lvl(BaseModel):
     id_actual: str
     role: str
+
+class ShiftRequest(BaseModel):
+    chosen_date: date  # Ensure the type and field name are correct

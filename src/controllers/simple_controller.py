@@ -3,7 +3,7 @@ import asyncio
 from src.database import calender, users
 from src.dto.calender_model import (
     Shift,
-    ShiftMember,
+    ShiftMember, ShiftRequest,
 )
 from src.dto.users_model import (
     User,
@@ -53,8 +53,8 @@ class Controller(metaclass=SingletonMeta):
         shift = await self.calenderdb.fetch_shift(shift)
         return shift
 
-    async def get_shifts_for_month(self, _date: date):
-        _calender = await self.calenderdb.fetch_month_shifts(_date)
+    async def get_shifts_for_month(self, shift_request: ShiftRequest):
+        _calender = await self.calenderdb.fetch_month_shifts(shift_request)
 
         return _calender
 
