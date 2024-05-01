@@ -28,7 +28,7 @@ class Controller(metaclass=SingletonMeta):
         await self.userdb.update_user(user)
 
     async def login(self, user_login: UserLogin) -> User:
-        user = await self.userdb.fetch_user(user_login)
+        user = await self.userdb.fetch_user_by_login(user_login)
         return user
 
     async def check_user_active(self, user: User) -> User:
@@ -62,21 +62,14 @@ class Controller(metaclass=SingletonMeta):
         await self.calenderdb.delete_shift(shift)
 
     async def create_shift_member(
-        self,
-        shift: Shift,
-        user: User,
-        wished: bool,
-        assigned: bool,
+        self, shift_member: ShiftMember
     ):
         await self.calenderdb.create_shift_member(
-            shift,
-            user,
-            wished,
-            assigned,
+            shift_member
         )
 
     async def update_shift_member(self, shiftmember: ShiftMember):
-        await self.calenderdb.update_shift(shiftmember)
+        await self.calenderdb.update_shift_member(shiftmember)
 
     async def fetch_shift_member(self, shiftmember: ShiftMember):
         shift_member = await self.calenderdb.fetch_shift_member(shiftmember)

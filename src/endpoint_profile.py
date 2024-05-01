@@ -24,6 +24,7 @@ from src.controllers import (
 from datetime import date
 from cryptography.fernet import Fernet
 from loguru import logger
+
 # Just an example of how to setup routing for CRUD
 
 router = APIRouter()
@@ -50,7 +51,7 @@ def get_cookie(request: Request):
 
 
 async def is_user_admin(
-    request: Request,
+        request: Request,
 ):
     uid_user = get_cookie(request)
     user = User(uid_user=uid_user)
@@ -74,6 +75,19 @@ async def create_user(user: CreateUser, request: Request):
             content={"message": "not successful creating user"},
             status_code=403,
         )
+
+@router.post("/fetch-user/")
+async def fetch_user(user: User, request: Request):
+    await is_user_admin(request)
+    try:
+        chosen_user = await controls.check_user_active(user)
+        return JSONResponse(
+            content={"message": "successfully fetched user", "data": chosen_user.dict()},
+            status_code=200,
+        )
+    except:
+        return JSONResponse(content={"message": "not successful fetching user"},
+            status_code=403,)
 
 
 @router.post("/user-login/")
@@ -122,7 +136,7 @@ async def delete_user(user: User, request: Request):
 
 @router.get("/fetch-all-users/")
 async def fetch_all_users(
-    request: Request,
+        request: Request,
 ):
     get_cookie(request)
     try:
@@ -138,6 +152,21 @@ async def fetch_all_users(
     except:
         return JSONResponse(
             content={"message": "not successful deleting user"},
+            status_code=403,
+        )
+
+@router.post("/update-user/")
+async def update_user(user: User, request: Request):
+    await is_user_admin(request)
+    try:
+        await controls.update_user(user)
+        return JSONResponse(
+            content={"message": "successfully updated user"},
+            status_code=200
+        )
+    except:
+        return JSONResponse(
+            content={"message": "not successful updating user"},
             status_code=403,
         )
 
@@ -183,8 +212,8 @@ class ShiftRequest(BaseModel):
 
 @router.post("/fetch-shifts-for-month/")
 async def fetch_shifts_for_month(
-    chosen_date: ShiftRequest,
-    request: Request,
+        chosen_date: ShiftRequest,
+        request: Request,
 ):
 
     logger.info(f"fetch shifts for: {request.cookies}")
@@ -222,7 +251,100 @@ async def delete_shift(shift: Shift, request: Request):
             status_code=403,
         )
 
+@router.post("/update-shift/")
+async def update_shift(shift: Shift, request: Request):
+    await is_user_admin(request)
+    try:
+        await controls.update_shift(shift)
+        return JSONResponse(
+            content={"message": "successfully updated shift"},
+            status_code=200
+        )
+    except:
+        return JSONResponse(
+            content={"message": "not successful updating shift"},
+            status_code=403,
+        )
 
-@router.options("/hi/")
-async def test_options():
-    return
+@router.post("/create-shift-member/")
+async def create_shift_member(shift_member: ShiftMember, request: Request):
+    if shift_member.wished is False or shift_member.assigned is True:
+        await is_user_admin(request)
+    try:
+        await controls.create_shift_member(shift_member)
+        return JSONResponse(
+            content={"message": "successfully created shift_member"},
+            status_code=200,
+        )
+    except:
+        return JSONResponse(
+            content={"message": "not successful creating shift_member"},
+            status_code=403,
+        )
+
+
+@router.post("/fetch-shift-member/")
+async def fetch_shift_member(shift_member: ShiftMember, request: Request):
+    await is_user_admin(request)
+    try:
+        _shift_member = await controls.fetch_shift_member(shift_member)
+        return JSONResponse(
+            content={
+                "message": "Successfully fetched shift",
+                "shift": _shift_member.dict(),
+            },
+            status_code=200,
+        )
+    except:
+        return JSONResponse(
+            content={"message": "not successful fetching shift"},
+            status_code=403,
+        )
+
+
+@router.post("/update-shift-member/")
+async def update_shift_member(shift_member: ShiftMember, request: Request):
+    await is_user_admin(request)
+    try:
+        await controls.update_shift_member(shift_member)
+        return JSONResponse(
+            content={"message": "successfully updated shift_member"},
+            status_code=200,
+        )
+    except:
+        return JSONResponse(
+            content={"message": "not successful updating shift_member"},
+            status_code=403,
+        )
+
+@router.post("/delete-shift-member/")
+async def delete_shift_member(shift_member: ShiftMember, request: Request):
+    await is_user_admin(request)
+    try:
+        await controls.delete_shift_member(shift_member)
+        return JSONResponse(
+            content={"message": "successfully deleted shift_member"},
+            status_code=200,
+        )
+    except:
+        return JSONResponse(
+            content={"message": "not successful deleting shift_member"},
+            status_code=403,
+        )
+
+
+@router.post("/fetch-all-shift-members/")
+async def fetch_all_shift_members(shift: Shift, request: Request):
+    await is_user_admin(request)
+    try:
+        _shift_members = await controls.fetch_all_shift_members(shift)
+        return JSONResponse(
+            content={"message": "successfully fetched shift_members for shift " + str(shift) ,
+                     "Shift members": _shift_members},
+            status_code=200,
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={"message": "not successful fetching shift_members for shift " + str(shift)},
+            status_code=403,
+        )
