@@ -24,9 +24,9 @@ class Shift(BaseModel):
 
 
 class Calender(BaseModel):
-    shifts: List[Shift]
-    month: str
-    year: str
+    shifts: list
+    month: int
+    year: int
 
     def to_dict(self):
         return {
