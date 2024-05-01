@@ -46,14 +46,15 @@ async def fetch_shift(shift: Shift) -> Shift:
         return result.scalars().first()
 
 
-async def fetch_month_shifts(date: datetime.date) -> list:
+async def fetch_month_shifts(date: datetime.date) -> list[Shift]:
     async with get_async_db_session() as session:
         stmt = select(ShiftORM).where(
             func.extract('month', ShiftORM.start_time) == date.month,
             func.extract('year', ShiftORM.start_time) == date.year
         )
         result = await session.execute(stmt)
-        return result.scalars().all()
+        shifts = result.scalars().all()
+        return [Shift(uid_shift=str(s.uid_shift), start_time=s.start_time, end_time=s.end_time, active=s.active) for s in shifts]
 
 
 """

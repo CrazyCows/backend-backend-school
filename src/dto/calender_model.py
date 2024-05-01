@@ -13,7 +13,6 @@ class ShiftMember(User):
     assigned: Optional[bool] = None  # true if the member has been assigned the shift
 
 
-
 class Shift(BaseModel):
     uid_shift: Optional[str] = None
     start_time: Optional[datetime] = None
@@ -28,6 +27,21 @@ class Calender(BaseModel):
     shifts: List[Shift]
     month: str
     year: str
+
+    def to_dict(self):
+        return {
+            "shifts": [{
+                "uid_shift": shift.uid_shift,
+                "start_time": shift.start_time.isoformat() if shift.start_time else None,
+                "end_time": shift.end_time.isoformat() if shift.end_time else None,
+                "wished_shift_members": [],
+                "actual_shift_members": [],
+                "active": shift.active,
+                "myShift": shift.myShift if shift.myShift is not None else False
+            } for shift in self.shifts],
+            "month": self.month,
+            "year": self.year
+        }
 
 
 class Clearnce_lvl(BaseModel):
