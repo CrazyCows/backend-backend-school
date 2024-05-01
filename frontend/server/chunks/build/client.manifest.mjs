@@ -6,23 +6,12 @@ const client_manifest = {
     "file": "VTextField.8etwgo9T.css",
     "src": "_!~{00c}~.js"
   },
-  "_B_IfrWQu.js": {
+  "_CONJSe-J.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "B_IfrWQu.js",
-    "name": "vue.f36acd1f",
-    "imports": [
-      "node_modules/nuxt/dist/app/entry.js"
-    ]
-  },
-  "_LZ6aDNKp.js": {
-    "resourceType": "script",
-    "module": true,
-    "prefetch": true,
-    "preload": true,
-    "file": "LZ6aDNKp.js",
+    "file": "CONJSe-J.js",
     "name": "VTextField",
     "imports": [
       "node_modules/nuxt/dist/app/entry.js"
@@ -36,6 +25,17 @@ const client_manifest = {
     "resourceType": "style",
     "prefetch": true,
     "preload": true
+  },
+  "_DL4WDFO8.js": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "file": "DL4WDFO8.js",
+    "name": "vue.f36acd1f",
+    "imports": [
+      "node_modules/nuxt/dist/app/entry.js"
+    ]
   },
   "node_modules/@mdi/font/fonts/materialdesignicons-webfont.eot": {
     "resourceType": "font",
@@ -66,13 +66,13 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "C9LXCYZd.js",
+    "file": "BaMKLx7c.js",
     "name": "error-404",
     "src": "node_modules/@nuxt/ui-templates/dist/templates/error-404.vue",
     "isDynamicEntry": true,
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_B_IfrWQu.js"
+      "_DL4WDFO8.js"
     ],
     "css": [
       "error-404.JekaaCis.css"
@@ -89,12 +89,12 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "Dmw2d2Wv.js",
+    "file": "hgCQt3O7.js",
     "name": "error-500",
     "src": "node_modules/@nuxt/ui-templates/dist/templates/error-500.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_B_IfrWQu.js",
+      "_DL4WDFO8.js",
       "node_modules/nuxt/dist/app/entry.js"
     ],
     "css": [
@@ -112,7 +112,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "DWLzgMwE.js",
+    "file": "_NSs7S4v.js",
     "name": "entry",
     "src": "node_modules/nuxt/dist/app/entry.js",
     "isEntry": true,
@@ -168,7 +168,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "Dz2iebvK.js",
+    "file": "Cv-JxKMI.js",
     "name": "panel",
     "src": "pages/admin/panel.vue",
     "isDynamicEntry": true,
@@ -181,7 +181,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "F192Bt0L.js",
+    "file": "CGFdbLmi.js",
     "name": "calendar",
     "src": "pages/calendar.vue",
     "isDynamicEntry": true,
@@ -203,7 +203,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "QgG7ty8A.js",
+    "file": "Dax1M2TQ.js",
     "name": "dashboard",
     "src": "pages/dashboard.vue",
     "isDynamicEntry": true,
@@ -225,7 +225,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "DgdFII4U.js",
+    "file": "2MO3UiDS.js",
     "name": "mor",
     "src": "pages/din/mor.vue",
     "isDynamicEntry": true,
@@ -238,13 +238,13 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "BM3JzJXa.js",
+    "file": "DDf11X92.js",
     "name": "index",
     "src": "pages/index.vue",
     "isDynamicEntry": true,
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_LZ6aDNKp.js"
+      "_CONJSe-J.js"
     ],
     "css": [
       "index.x2_ROean.css"
@@ -264,7 +264,7 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "CjE21lMr.js",
+    "file": "CRo3nHzl.js",
     "name": "library",
     "src": "pages/library.vue",
     "isDynamicEntry": true,
@@ -277,13 +277,13 @@ const client_manifest = {
     "module": true,
     "prefetch": true,
     "preload": true,
-    "file": "u58s2_sk.js",
+    "file": "DR5SrjDf.js",
     "name": "login",
     "src": "pages/login.vue",
     "isDynamicEntry": true,
     "imports": [
       "node_modules/nuxt/dist/app/entry.js",
-      "_LZ6aDNKp.js"
+      "_CONJSe-J.js"
     ]
   },
   "public/background.webp": {
