@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import update
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
-from src.dto.calender_model import Shift, ShiftMember, ShiftRequest  # Ensure these are SQLAlchemy ORM models
+from src.dto.calender_model import Shift, ShiftMember  # Ensure these are SQLAlchemy ORM models
 from src.database.models import ShiftORM, ShiftMemberORM
 from src.dto.users_model import User
 from src.conf.settings import settings
@@ -46,17 +46,15 @@ async def fetch_shift(shift: Shift) -> Shift:
         return result.scalars().first()
 
 
-async def fetch_month_shifts(shift_request: ShiftRequest) -> list[Shift]:
-    _date = shift_request.chosen_date
+async def fetch_month_shifts(date: datetime.date) -> list[Shift]:
     async with get_async_db_session() as session:
         stmt = select(ShiftORM).where(
-            func.extract('month', ShiftORM.start_time) == _date.month,
-            func.extract('year', ShiftORM.start_time) == _date.year
+            func.extract('month', ShiftORM.start_time) == date.month,
+            func.extract('year', ShiftORM.start_time) == date.year
         )
         result = await session.execute(stmt)
-        return result.scalars().all()
-
-
+        shifts = result.scalars().all()
+        return [Shift(uid_shift=str(s.uid_shift), start_time=s.start_time, end_time=s.end_time, active=s.active) for s in shifts]
 
 
 """
@@ -120,14 +118,13 @@ async def main():
 
     shift_member = ShiftMember(uid_user="c27507bd-41a8-4d7b-b6a1-6b4c62b6935e",
                                uid_shift="6db795a6-2e92-42a8-9991-0a5c4320dba7")
-    shift_request = ShiftRequest(chosen_date=datetime.now().date())
-    # await create_shift(shift)
-    values = await fetch_month_shifts(shift_request)
-    print(values)
+
+    #await create_shift(shift)
+    #values = await fetch_month_shifts(datetime.now())
     #await create_shift_member(shift_member)
     #shiftmember = await fetch_shift_member(shift_member.uid_shift, shift_member.uid_user)
     #await delete_shift_member(shift_member)
-    #await delete_shift(shift)
+    await delete_shift(shift)
     print("-------------- result --------------")
     #print(shiftmember.uid_shift)
     """

@@ -16,7 +16,7 @@ from src.dto.users_model import (
     CreateUser,
 )
 from src.dto.calender_model import (
-    Shift, ShiftMember, ShiftRequest,
+    Shift, Calender
 )
 from src.controllers import (
     simple_controller,
@@ -177,29 +177,30 @@ async def fetch_shift(shift: Shift, request: Request):
         )
 
 
+class ShiftRequest(BaseModel):
+    chosen_date: date  # Ensure the type and field name are correct
+
+
 @router.post("/fetch-shifts-for-month/")
 async def fetch_shifts_for_month(
     chosen_date: ShiftRequest,
     request: Request,
 ):
-    logger.info(f"fetch shifts for: {chosen_date.chosen_date}")
-    chosen_date = ShiftRequest(chosen_date=chosen_date.chosen_date)
 
+    logger.info(f"fetch shifts for: {request.cookies}")
+    chosen_date = chosen_date.chosen_date
     uid_user = get_cookie(request)
-    user = User(uid_user=uid_user)
     try:
-        print("hi")
         month_calender = await controls.get_shifts_for_month(chosen_date)
-        print("hi")
+        calender = Calender(shifts=month_calender, year=chosen_date.year, month=chosen_date.month)
         return JSONResponse(
             content={
                 "message": "successfully fetched all shifts for month",
-                "shifts": month_calender.dict(),
+                "shifts": calender.to_dict(),
             },
             status_code=200,
         )
-    except Exception as e:
-        logger.info(f"Failed cause: {e}")
+    except:
         return JSONResponse(
             content={"message": "not successful fetching all shifts for month"},
             status_code=400,
