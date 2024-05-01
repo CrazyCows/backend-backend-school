@@ -16,7 +16,7 @@ from src.dto.users_model import (
     CreateUser,
 )
 from src.dto.calender_model import (
-    Shift, Calender
+    Shift, Calender, ShiftMember
 )
 from src.controllers import (
     simple_controller,
