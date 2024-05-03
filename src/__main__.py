@@ -47,6 +47,21 @@ app.add_middleware(
 
 app.include_router(profile, prefix="")
 
+
+def server_start():
+    try:
+        create_db()
+        create_clearence_level_sync("admin")
+        create_clearence_level_sync("dev")
+        create_clearence_level_sync("coworker")
+        createuser = CreateUser(name="John Doe", email="john@doe.com", phone="87654321", role="admin", username="john", password="t")
+        create_user_sync(createuser)
+    except:
+        print("Failed to create clearence level")
+
+server_start()
+
+
 # TODO: Create a function for creating tables and database upon start. Only if they don't exists.
 if __name__ == "__main__":
     # create_db()
@@ -55,4 +70,5 @@ if __name__ == "__main__":
     # createuser = CreateUser(name="John Doe", email="john@doe.com", phone="87654321", role="admin", username="john", password="ZEUvE2zTFB")
     # Example database operations
     # create_user_sync(createuser)
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # uvicorn.run(app, host="0.0.0.0", port=8000)
+    """"""

@@ -35,4 +35,4 @@ RUN poetry install
 RUN useradd --create-home appuser
 USER appuser
 
-CMD ["/usr/local/bin/python", "-m", "src"]
+CMD ["uvicorn", "src.__main__:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

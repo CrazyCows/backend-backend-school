@@ -3,3 +3,4 @@
 /frontend/server/package-lock.json
 /frontend/server/node_modules/
 /.vscode/
+/nginx/nginx_secrets/*
