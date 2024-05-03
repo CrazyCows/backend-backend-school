@@ -23,6 +23,7 @@ from src.controllers import (
 )
 from datetime import date
 from cryptography.fernet import Fernet
+import re
 from loguru import logger
 # Just an example of how to setup routing for CRUD
 
@@ -47,7 +48,12 @@ def get_cookie(request: Request):
         decrypted_data = decrypt_data(encrypted_data)
         return decrypted_data  # Should be userId (for the love of god)
     raise HTTPException(status_code=403)
-
+def validate_email(email: str) -> bool:
+    regex = r"^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+    return re.match(regex, email) is not None
+def validate_phone_number(phone_number: str) -> bool:
+    regex = r"^\d{8}$"
+    return re.match(regex, phone_number) is not None
 
 async def is_user_admin(
     request: Request,
@@ -59,10 +65,19 @@ async def is_user_admin(
         raise HTTPException(status_code=403)
 
 
-# TODO: Discuss if this should return
 @router.post("/create-user/")
 async def create_user(user: CreateUser, request: Request):
     await is_user_admin(request)
+    if(validate_email(user.email) == False):
+        return JSONResponse(
+            content={"message": "email needs to be a valid email address"},
+            status_code=400,
+        )
+    if(validate_phone_number(user.phone) == False):
+        return JSONResponse(
+            content={"message": "phone number needs to be a valid danish phone number, with no land code"},
+            status_code=400,
+        )
     try:
         await controls.create_user(user)
         return JSONResponse(
@@ -92,7 +107,7 @@ async def user_login(user: UserLogin):
             value=encrypted_data,
             max_age=max_age,
             httponly=True,
-            samesite="none",
+            samesite="strict",
             secure=True
         )
         return response
@@ -222,7 +237,3 @@ async def delete_shift(shift: Shift, request: Request):
             status_code=403,
         )
 
-
-@router.options("/hi/")
-async def test_options():
-    return

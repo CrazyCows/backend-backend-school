@@ -28,19 +28,6 @@ services:
       - "3000:3000"
     command: sh -c "node ./index.mjs"
 
-  #nginx:
-  #  image: nginx:latest
-  #  ports:
-  #    - "80:80"
-  #    - "443:443"
-  #  volumes:
-  #    - ./nginx/conf.d:/etc/nginx/conf.d
-  #    - ./nginx/static:/var/www/static
-  #    - ./nginx/cert:/etc/nginx/cert
-  #  depends_on:
-  #    - app
-  #    - node
-
   nginx:
     image: jonasal/nginx-certbot:latest
     restart: unless-stopped
@@ -54,6 +41,7 @@ services:
     volumes:
       - ./nginx/nginx_secrets:/etc/letsencrypt
       - ./nginx/user_conf.d:/etc/nginx/user_conf.d
+      - ./nginx/loaderio:/var/www/loaderio
     depends_on:
       - app
       - node
